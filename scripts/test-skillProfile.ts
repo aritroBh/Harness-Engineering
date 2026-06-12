@@ -59,7 +59,10 @@ async function main(): Promise<void> {
     0,
     getProfile("Gmail"),
   );
-  assert(updated.knows.includes("schedule a send"), "adds completed goal to knows");
+  assert(
+    updated.knows.includes("schedule a send"),
+    "adds completed goal to knows",
+  );
   assert(
     updated.proficiency === "intermediate",
     "clean run bumps proficiency one rung (beginner+ → intermediate)",
@@ -79,11 +82,17 @@ async function main(): Promise<void> {
     appHint: "Gmail",
   });
   assert(res.greeting.startsWith("Welcome back!"), "greets returning users");
-  assert(res.greeting.includes("composing"), "greeting references prior knowledge");
+  assert(
+    res.greeting.includes("composing"),
+    "greeting references prior knowledge",
+  );
   endSession();
 
   const fresh = await startSession({ goal: "do a thing", appHint: "Figma" });
-  assert(!fresh.greeting.startsWith("Welcome back!"), "first-timer gets generic greeting");
+  assert(
+    !fresh.greeting.startsWith("Welcome back!"),
+    "first-timer gets generic greeting",
+  );
   endSession();
 
   console.log("\nALL PASS");

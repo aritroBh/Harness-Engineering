@@ -107,11 +107,14 @@ export async function replayAutoExecute(steps: Step[]): Promise<void> {
           step,
           reason: "prohibited autonomous action",
         });
-        emitAgentAction(`Blocked: "${stepTitle(step)}" needs your confirmation`, {
-          detail: "safety filter — autonomous execution refused",
-          status: "warn",
-          stepIndex: index,
-        });
+        emitAgentAction(
+          `Blocked: "${stepTitle(step)}" needs your confirmation`,
+          {
+            detail: "safety filter — autonomous execution refused",
+            status: "warn",
+            stepIndex: index,
+          },
+        );
         break;
       }
       emitAgentAction(actionVerb(step), {

@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Button,
-  Buttons,
-  Card,
-  CardHeader,
-  Tag,
-} from "@openuidev/react-ui";
+import { Button, Buttons, Card, CardHeader, Tag } from "@openuidev/react-ui";
 
 interface SessionPanelProps {
   intent: string;

@@ -12,7 +12,10 @@ import { WalkthroughGuide } from "../overlay/WalkthroughGuide";
 import { SpecBuddy } from "../overlay/SpecBuddy";
 import { ModeToggle } from "../overlay/ModeToggle";
 import { SessionPanel } from "../overlay/SessionPanel";
-import { ProgressTracker, type AgentActionEvent } from "../overlay/ProgressTracker";
+import {
+  ProgressTracker,
+  type AgentActionEvent,
+} from "../overlay/ProgressTracker";
 import { SpecterWorkflowButton } from "../overlay/SpecterWorkflowButton";
 import {
   buildStepHistory,
@@ -559,8 +562,8 @@ const OverlayApp: React.FC = () => {
           } else if (result?.providerUsed === "openai") {
             console.log("[TTS] used OpenAI fallback");
           }
-            void (async () => {
-              if (modeRef.current !== "ultra") {
+          void (async () => {
+            if (modeRef.current !== "ultra") {
               setUltraState("waitingForUser");
               return;
             }
@@ -1282,7 +1285,9 @@ const OverlayApp: React.FC = () => {
         if (prediction) {
           setUltraSessionHistory((prev) => {
             if (prev.length > 0) return prev;
-            return [{ role: "assistant", content: prediction, proactive: true }];
+            return [
+              { role: "assistant", content: prediction, proactive: true },
+            ];
           });
           if (modeRef.current === "ultra") {
             speakIfUltra(prediction, "proactive summon");

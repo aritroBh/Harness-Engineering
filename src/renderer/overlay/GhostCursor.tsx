@@ -6,6 +6,16 @@ import {
 } from "./viewportCoords";
 import { GhostCursorIcon } from "./GhostCursorIcon";
 
+const FALLBACK_POSITION = { x: 50, y: 50 };
+
+function getStepPosition(step: any): { x: number; y: number } | null {
+  if (!step) return null;
+  const x = step.viewportX ?? step.x;
+  const y = step.viewportY ?? step.y;
+  if (x == null || y == null) return null;
+  return { x: clampPercent(x), y: clampPercent(y) };
+}
+
 interface GhostCursorProps {
   isVisible: boolean;
   mood?: string;
@@ -27,10 +37,11 @@ export const GhostCursor: React.FC<GhostCursorProps> = ({
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  if (!isVisible || !step) return null;
+  if (!isVisible) return null;
 
-  const percentX = clampPercent(step.viewportX ?? step.x);
-  const percentY = clampPercent(step.viewportY ?? step.y);
+  const stepPos = getStepPosition(step);
+  const percentX = stepPos?.x ?? FALLBACK_POSITION.x;
+  const percentY = stepPos?.y ?? FALLBACK_POSITION.y;
 
   return (
     <div

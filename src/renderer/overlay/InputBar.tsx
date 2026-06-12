@@ -301,7 +301,9 @@ export const InputBar: React.FC<InputBarProps> = ({
           onMouseLeave={onRecordingOverlayMouseLeave}
         />
       )}
-      <div className={`input-bar openui-input-bar ${disabled ? "is-disabled" : ""}`}>
+      <div
+        className={`input-bar openui-input-bar ${disabled ? "is-disabled" : ""}`}
+      >
         <div className="input-bar-brand" title="Specter" aria-hidden="true">
           <SpecterMarkIcon />
         </div>

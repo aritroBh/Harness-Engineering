@@ -56,7 +56,9 @@ async function main(): Promise<void> {
   const next = getCurrentStep();
   assert(next!.stepId === 2, "advances to step 2");
   assert(
-    events.some((e) => e.type === "step_advanced" || e.type === "goal_complete"),
+    events.some(
+      (e) => e.type === "step_advanced" || e.type === "goal_complete",
+    ),
     "emits a follow-up event",
   );
 

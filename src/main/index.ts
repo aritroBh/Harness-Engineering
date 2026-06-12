@@ -791,9 +791,7 @@ function createWindow(): void {
   });
 
   mainWindow.on("ready-to-show", () => {
-    safeLog(
-      "[WINDOW_ROUTING] practice window ready",
-    );
+    safeLog("[WINDOW_ROUTING] practice window ready");
   });
 
   mainWindow.on("closed", () => {

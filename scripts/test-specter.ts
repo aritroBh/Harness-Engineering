@@ -301,7 +301,9 @@ async function main() {
     readFile("src/renderer/overlay/ProgressTracker.tsx").includes(
       "specter-rail-steps-list--full",
     ) &&
-      readFile("src/renderer/overlay/stepHistory.ts").includes("sessionComplete"),
+      readFile("src/renderer/overlay/stepHistory.ts").includes(
+        "sessionComplete",
+      ),
     "ProgressTracker shows full step list with persistent session state",
   );
   check(
@@ -326,7 +328,7 @@ async function main() {
   );
   check(
     readFile("src/renderer/overlay/InputBar.tsx").includes(
-      '@openuidev/react-ui',
+      "@openuidev/react-ui",
     ) &&
       readFile("src/renderer/overlay/InputBar.tsx").includes("<Input") &&
       readFile("src/renderer/overlay/InputBar.tsx").includes("<IconButton"),

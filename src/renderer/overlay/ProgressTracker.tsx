@@ -211,7 +211,11 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
                   <div className="specter-rail-section-head">
                     <span>Agent actions</span>
                     <Tag
-                      text={agentActions.length > 5 ? `last 5 of ${agentActions.length}` : "live"}
+                      text={
+                        agentActions.length > 5
+                          ? `last 5 of ${agentActions.length}`
+                          : "live"
+                      }
                       variant="info"
                       size="sm"
                     />
@@ -224,10 +228,14 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
                       >
                         <div className="specter-rail-agent-entry-head">
                           <span className="specter-rail-agent-status-dot" />
-                          <span className="specter-rail-agent-label">{action.label}</span>
+                          <span className="specter-rail-agent-label">
+                            {action.label}
+                          </span>
                         </div>
                         {action.detail && (
-                          <div className="specter-rail-agent-detail">{action.detail}</div>
+                          <div className="specter-rail-agent-detail">
+                            {action.detail}
+                          </div>
                         )}
                       </div>
                     ))}

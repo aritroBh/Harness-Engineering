@@ -34,7 +34,11 @@ export function buildStepHistory(input: StepHistoryInput): StepRecord[] {
 
     if (correctedIndices.has(index)) {
       status = "corrected";
-    } else if (sessionComplete || completedIndices.has(index) || index < effectiveCurrent) {
+    } else if (
+      sessionComplete ||
+      completedIndices.has(index) ||
+      index < effectiveCurrent
+    ) {
       status = "completed";
     } else if (index === effectiveCurrent && !sessionComplete) {
       status = "current";
