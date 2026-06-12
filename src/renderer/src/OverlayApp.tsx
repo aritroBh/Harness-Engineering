@@ -28,6 +28,7 @@ import { TargetPreviewGhost } from "../overlay/TargetPreviewGhost";
 import { usePerimeterRoam } from "../overlay/usePerimeterRoam";
 import { VoiceMicButton } from "../overlay/VoiceMicButton";
 import { buildReasoningLines } from "../overlay/buildReasoningLines";
+import { shouldAcceptAmbientTranscript } from "../overlay/transcriptFilter";
 import type {
   BehavioralCheckpoint,
   BehavioralDiff,
@@ -541,6 +542,120 @@ const OverlayApp: React.FC = () => {
     }
   }, []);
 
+  // Hands-free listener. Tuned so real questions survive and ambient noise
+  // doesn't: the utterance clock starts at first detected speech (not at
+  // listen start), a thinking pause doesn't cut the user off, and transcripts
+  // must pass the hallucination filter before they count as user input —
+  // Whisper invents phrases like "Thank you." on silence, which is what made
+  // the ghost talk to nobody.
+  const ghostAutoListen = async (): Promise<void> => {
+    if (modeRef.current !== "ultra" && !demoPresentationRef.current) {
+      setUltraState("waitingForUser");
+      return;
+    }
+
+    cancelGhostListen();
+    const listenCtx = { cancelled: false };
+    ghostListenAbortRef.current = listenCtx;
+    setUltraState("listening");
+
+    const { MicRecorder } = await import("../overlay/MicRecorder");
+    const recorder = new MicRecorder();
+
+    const POLL_MS = 150;
+    const SILENCE_CONFIRM_MS = 1500;
+    const MAX_LEAD_SILENCE_MS = 8000;
+    const MAX_UTTERANCE_MS = 20_000;
+    const startedAt = Date.now();
+    let speechStartAt: number | null = null;
+    let voicedMs = 0;
+    let silenceStartAt: number | null = null;
+
+    try {
+      await recorder.start();
+    } catch {
+      ghostListenAbortRef.current = null;
+      setUltraState("waitingForUser");
+      return;
+    }
+
+    await new Promise<void>((resolve) => {
+      const poll = setInterval(() => {
+        const now = Date.now();
+        if (
+          listenCtx.cancelled ||
+          (!speechStartAt && now - startedAt >= MAX_LEAD_SILENCE_MS) ||
+          (speechStartAt && now - speechStartAt >= MAX_UTTERANCE_MS)
+        ) {
+          clearInterval(poll);
+          resolve();
+          return;
+        }
+        const levels = recorder.getAudioLevels();
+        if (levels && levels.length > 0) {
+          // Use peak value rather than average — much more reliable for speech detection.
+          // Frequency bins during speech will have several bins with high energy (200+),
+          // while ambient noise stays mostly under 60 across all bins.
+          let peak = 0;
+          for (let i = 0; i < levels.length; i++) {
+            if (levels[i] > peak) peak = levels[i];
+          }
+          // Peak > 80 reliably indicates speech on most microphones in most environments.
+          // Much more robust than averaging which gets pulled down by silent bins.
+          if (peak > 80) {
+            if (!speechStartAt) speechStartAt = now;
+            voicedMs += POLL_MS;
+            silenceStartAt = null;
+          } else if (speechStartAt) {
+            if (!silenceStartAt) silenceStartAt = now;
+            else if (now - silenceStartAt >= SILENCE_CONFIRM_MS) {
+              clearInterval(poll);
+              resolve();
+            }
+          }
+        }
+      }, POLL_MS);
+    });
+
+    if (listenCtx.cancelled) {
+      await recorder.stop().catch(() => {});
+      return;
+    }
+
+    const buffer = await recorder.stop().catch(() => new ArrayBuffer(0));
+
+    if (!buffer.byteLength || !speechStartAt) {
+      ghostListenAbortRef.current = null;
+      setUltraState("waitingForUser");
+      return;
+    }
+
+    setUltraState("transcribing");
+    const transcribeResult = await (window as any).api
+      .transcribe(buffer)
+      .catch(() => ({ ok: false }));
+
+    if (listenCtx.cancelled) return;
+    ghostListenAbortRef.current = null;
+
+    const spokenText =
+      transcribeResult?.ok && typeof transcribeResult.text === "string"
+        ? transcribeResult.text.trim()
+        : "";
+
+    if (spokenText && shouldAcceptAmbientTranscript(spokenText, voicedMs)) {
+      await handleUltraSpokenInput(spokenText);
+    } else {
+      if (spokenText) {
+        console.log("[LISTEN] discarded ambient transcript", {
+          spokenText,
+          voicedMs,
+        });
+      }
+      setUltraState("waitingForUser");
+    }
+  };
+
   const speakIfUltra = (text: string, moment: string) => {
     const currentMode = modeRef.current;
     const demoMode = demoPresentationRef.current;
@@ -568,105 +683,7 @@ const OverlayApp: React.FC = () => {
           } else if (result?.providerUsed === "gemini") {
             console.log("[TTS] used Gemini fallback");
           }
-          void (async () => {
-            if (modeRef.current !== "ultra" && !demoPresentationRef.current) {
-              setUltraState("waitingForUser");
-              return;
-            }
-
-            cancelGhostListen();
-            const listenCtx = { cancelled: false };
-            ghostListenAbortRef.current = listenCtx;
-            setUltraState("listening");
-
-            const { MicRecorder } = await import("../overlay/MicRecorder");
-            const recorder = new MicRecorder();
-
-            const SILENCE_CONFIRM_MS = 1200;
-            const MAX_LISTEN_MS = 7000;
-            const startedAt = Date.now();
-            let speechDetected = false;
-            let silenceStartAt: number | null = null;
-
-            try {
-              await recorder.start();
-            } catch {
-              ghostListenAbortRef.current = null;
-              setUltraState("waitingForUser");
-              return;
-            }
-
-            await new Promise<void>((resolve) => {
-              const poll = setInterval(() => {
-                if (
-                  listenCtx.cancelled ||
-                  Date.now() - startedAt >= MAX_LISTEN_MS
-                ) {
-                  clearInterval(poll);
-                  resolve();
-                  return;
-                }
-                const levels = recorder.getAudioLevels();
-                if (levels && levels.length > 0) {
-                  // Use peak value rather than average — much more reliable for speech detection.
-                  // Frequency bins during speech will have several bins with high energy (200+),
-                  // while ambient noise stays mostly under 60 across all bins.
-                  let peak = 0;
-                  for (let i = 0; i < levels.length; i++) {
-                    if (levels[i] > peak) peak = levels[i];
-                  }
-                  // Peak > 80 reliably indicates speech on most microphones in most environments.
-                  // Much more robust than averaging which gets pulled down by silent bins.
-                  if (peak > 80) {
-                    speechDetected = true;
-                    silenceStartAt = null;
-                  } else if (speechDetected) {
-                    if (!silenceStartAt) silenceStartAt = Date.now();
-                    else if (
-                      Date.now() - silenceStartAt >=
-                      SILENCE_CONFIRM_MS
-                    ) {
-                      clearInterval(poll);
-                      resolve();
-                    }
-                  }
-                }
-              }, 150);
-            });
-
-            if (listenCtx.cancelled) {
-              await recorder.stop().catch(() => {});
-              return;
-            }
-
-            const buffer = await recorder
-              .stop()
-              .catch(() => new ArrayBuffer(0));
-
-            if (!buffer.byteLength || !speechDetected) {
-              ghostListenAbortRef.current = null;
-              setUltraState("waitingForUser");
-              return;
-            }
-
-            setUltraState("transcribing");
-            const transcribeResult = await (window as any).api
-              .transcribe(buffer)
-              .catch(() => ({ ok: false }));
-
-            if (listenCtx.cancelled) return;
-            ghostListenAbortRef.current = null;
-
-            if (
-              transcribeResult?.ok &&
-              typeof transcribeResult.text === "string" &&
-              transcribeResult.text.trim()
-            ) {
-              await handleUltraSpokenInput(transcribeResult.text);
-            } else {
-              setUltraState("waitingForUser");
-            }
-          })();
+          void ghostAutoListen();
         })
         .catch((error: unknown) => {
           setIsSpeaking(false);
@@ -1310,19 +1327,18 @@ const OverlayApp: React.FC = () => {
           });
         }
 
+        // The prediction is context, not conversation: show it silently and
+        // start listening. Reading it aloud on every summon was the ghost
+        // "randomly talking" before the user had said anything.
         const prediction = predictionRes?.prediction?.trim();
         if (prediction) {
           setUltraSessionHistory((prev) => {
             if (prev.length > 0) return prev;
-            return demoPresentationRef.current
-              ? prev
-              : [{ role: "assistant", content: prediction, proactive: true }];
+            return [{ role: "assistant", content: prediction, proactive: true }];
           });
-          if (modeRef.current === "ultra" || demoPresentationRef.current) {
-            speakIfUltra(prediction, "proactive summon");
-          } else {
-            setUltraState("waitingForUser");
-          }
+        }
+        if (modeRef.current === "ultra" || demoPresentationRef.current) {
+          void ghostAutoListen();
         } else {
           setUltraState("waitingForUser");
         }

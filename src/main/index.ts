@@ -1854,6 +1854,13 @@ app.whenReady().then(async () => {
         : graph.sessions.filter((s) => s.steps.length > 0);
       const latest = sessions.length > 0 ? sessions[sessions.length - 1] : null;
       const steps = latest?.steps || [];
+      if (steps.length === 0) {
+        // Replaying zero steps looked like success while showing nothing —
+        // the renderer must hear about it so the user does too.
+        throw new Error(
+          "No saved workflow steps to walk through yet. Record a session or load the demo workflow first.",
+        );
+      }
       await replayWalkthrough(steps, () => {});
     },
   );
