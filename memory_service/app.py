@@ -1,14 +1,22 @@
 import os
 import logging
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # load .env so CLICKHOUSE_* / EMBED_* are available when served
+except Exception:
+    pass
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
-from .schemas import IngestRequest, IngestResponse, QueryRequest, QueryResponse, LintRequest, LintResponse
+from .schemas import (IngestRequest, IngestResponse, QueryRequest, QueryResponse,
+                      LintRequest, LintResponse, LearnRequest)
 from .cognee_adapter import CogneeAdapter
 from .wiki_store import WikiStore
 from .lint_engine import LintEngine
+from .embedder import Embedder
+from .clickhouse_store import ClickHouseRetriever
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger("ross")
 
 app = FastAPI(title="GhostWiki Memory Service")
 
@@ -20,9 +28,38 @@ wiki_store = WikiStore(WIKI_ROOT)
 cognee_adapter = CogneeAdapter(enabled=COGNEE_ENABLED)
 lint_engine = LintEngine(wiki_store)
 
+# Ross — ClickHouse-backed GraphRAG retrieval ("Retr KG"). Auto-disables if
+# CLICKHOUSE_HOST is unset, leaving the existing cognee/fallback path intact.
+embedder = Embedder()
+ross = ClickHouseRetriever(embedder=embedder)
+
 @app.get("/health")
 def health():
-    return {"status": "ok", "cognee_enabled": COGNEE_ENABLED, "wiki_root": WIKI_ROOT}
+    return {
+        "status": "ok",
+        "cognee_enabled": COGNEE_ENABLED,
+        "wiki_root": WIKI_ROOT,
+        "clickhouse_enabled": ross.enabled,
+        "embed_provider": embedder.provider if embedder.enabled else None,
+    }
+
+@app.get("/stats")
+def stats():
+    """Current knowledge size in Ross (watch it grow as you ingest)."""
+    return ross.stats()
+
+@app.post("/learn", response_model=IngestResponse)
+def learn(request: LearnRequest):
+    """Specter -> Ross write path: learn interactions/observations directly
+    (no files). Each document is chunked, embedded and stored in ClickHouse."""
+    if not ross.enabled:
+        raise HTTPException(status_code=503, detail="Ross (ClickHouse) is not enabled")
+    docs = [d.model_dump() for d in request.documents]
+    if not docs:
+        return IngestResponse(ok=True, mode="clickhouse", warnings=["no documents"], sources_ingested=0)
+    n, warnings = ross.ingest_documents(docs)
+    logger.info("🧠 LEARNED %d chunks from %d interaction(s) pushed by Specter", n, len(docs))
+    return IngestResponse(ok=True, mode="clickhouse", warnings=warnings, sources_ingested=n)
 
 @app.post("/ingest", response_model=IngestResponse)
 async def ingest(request: IngestRequest):
@@ -34,6 +71,16 @@ async def ingest(request: IngestRequest):
     if not files_to_ingest:
         return IngestResponse(ok=True, mode="fallback", warnings=["No files found to ingest."], sources_ingested=0)
 
+    # Prefer Ross (ClickHouse) — chunk + embed + load the site.md docs.
+    if ross.enabled:
+        try:
+            n, warnings = ross.ingest_files(files_to_ingest, wiki_store.read_file)
+            logger.info("🧠 LEARNED %d chunks from %d doc(s) -> ClickHouse", n, len(files_to_ingest))
+            return IngestResponse(ok=True, mode="clickhouse", warnings=warnings, sources_ingested=n)
+        except Exception as e:
+            logger.error("Ross ingest failed: %s", e)
+            # fall through to cognee/fallback
+
     success, warnings = await cognee_adapter.ingest(files_to_ingest)
 
     if success:
@@ -44,6 +91,32 @@ async def ingest(request: IngestRequest):
 
 @app.post("/query", response_model=QueryResponse)
 async def query(request: QueryRequest):
+    # Prefer Ross (ClickHouse GraphRAG). Returns structured journey + graph context.
+    if ross.enabled:
+        result = ross.retrieve(request.query)
+        if result:
+            logger.info(
+                "🔍 QUERY %r -> %d seeds | site=%s protocol=%s | %d journey steps, %d graph nbrs",
+                request.query, len(result["seeds"]), result.get("site_id"),
+                result.get("protocol"), len(result.get("journey", [])),
+                len(result.get("graph_context", [])),
+            )
+            return QueryResponse(
+                ok=True,
+                mode="clickhouse",
+                warnings=[],
+                answer=result["answer"],
+                sources=[
+                    {"id": s["chunk_id"], "title": s["heading"],
+                     "content": s["content"][:1500], "score": s.get("score", 1.0)}
+                    for s in result["seeds"]
+                ],
+                site_id=result.get("site_id"),
+                protocol=result.get("protocol"),
+                journey=result.get("journey", []),
+                graph_context=result.get("graph_context", []),
+            )
+
     success, answer, sources, warnings = await cognee_adapter.query(request.query)
 
     if success:
