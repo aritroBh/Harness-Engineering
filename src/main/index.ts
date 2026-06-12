@@ -42,7 +42,7 @@ import {
   setBrainEventEmitter,
 } from "./session/tutorSession";
 import { startVerification } from "./session/verificationLoop";
-import { seedDemoProfile, getProfile } from "./session/skillProfileStore";
+import { getProfile } from "./session/skillProfileStore";
 import { getPeekabooStatus } from "./automation/peekabooAdapter";
 import {
   enterSplitScreen,
@@ -73,11 +73,6 @@ import { registerClinicalIpc } from "./clinical/ipc";
 import { hasActiveReplay, stopReplay } from "./session/replayController";
 import { mirrorReplayExecute } from "./session/mirrorReplay";
 import {
-  CONTROLLED_DEMO_HEIGHT,
-  CONTROLLED_DEMO_WIDTH,
-  createControlledDemoWorkflow,
-} from "./session/demoWorkflow";
-import {
   mapPercentToScreen,
   normalizeCapturedTargetToViewportPercent,
   setActiveCoordinateDisplay,
@@ -102,7 +97,6 @@ import {
   recordAppSwitchFrame,
   recordBehavioralFrame,
   recordBehavioralFeedback,
-  seedDemoCheckpoints,
   setBehavioralStateEmitter,
   setForegroundAppProvider,
   startBehavioralTracking,
@@ -414,6 +408,9 @@ function centerContentBounds(
   };
 }
 
+const PRACTICE_WINDOW_WIDTH = 900;
+const PRACTICE_WINDOW_HEIGHT = 650;
+
 function movePracticeWindowToDisplay(
   display: Display,
   showWindow: boolean,
@@ -421,7 +418,7 @@ function movePracticeWindowToDisplay(
   if (!mainWindow || mainWindow.isDestroyed()) return;
 
   mainWindow.setContentBounds(
-    centerContentBounds(display, CONTROLLED_DEMO_WIDTH, CONTROLLED_DEMO_HEIGHT),
+    centerContentBounds(display, PRACTICE_WINDOW_WIDTH, PRACTICE_WINDOW_HEIGHT),
   );
   safeLog(
     "[WINDOW_ROUTING] moved practice window to display",
@@ -778,8 +775,8 @@ uIOhook.on("keydown", (e) => {
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
-    width: CONTROLLED_DEMO_WIDTH,
-    height: CONTROLLED_DEMO_HEIGHT,
+    width: PRACTICE_WINDOW_WIDTH,
+    height: PRACTICE_WINDOW_HEIGHT,
     minWidth: 760,
     minHeight: 560,
     show: false,
@@ -795,7 +792,7 @@ function createWindow(): void {
 
   mainWindow.on("ready-to-show", () => {
     safeLog(
-      "[WINDOW_ROUTING] practice window ready and waiting for controlled demo",
+      "[WINDOW_ROUTING] practice window ready",
     );
   });
 
@@ -1525,10 +1522,6 @@ app.whenReady().then(async () => {
     ok: true,
     profile: getProfile(app),
   }));
-  ipcMain.handle("profile:seed-demo", (_event, app?: string) => {
-    seedDemoProfile(app ?? "Gmail");
-    return { ok: true };
-  });
 
   ipcMain.handle("agent:compileNoteHtml", async (event, input) => {
     if (!validateSender(event, overlayWindow))
@@ -1643,30 +1636,6 @@ app.whenReady().then(async () => {
   );
 
   ipcMain.handle(
-    "behavior:seedDemo",
-    async (_event, appName = DEFAULT_APP_NAME) => {
-      if (
-        app.isPackaged &&
-        process.env.SPECTER_ENABLE_DEV_FALLBACK !== "true"
-      ) {
-        throw new Error(
-          "Synthetic demo checkpoints are a dev-only fallback and cannot be used as learned behavior.",
-        );
-      }
-      const result = seedDemoCheckpoints(loadGraph(appName));
-      saveGraph(result.graph);
-      const current = result.checkpoints[result.checkpoints.length - 1];
-      sendOverlayEvent("behavior:checkpoint-created", current);
-      sendOverlayEvent(
-        "spec:state",
-        current?.signature || getCurrentBehavioralState(),
-      );
-      sendOverlayEvent("spec:mood", current?.signature.moodLabel || "idle");
-      return sortedBehavioralCheckpoints(result.graph);
-    },
-  );
-
-  ipcMain.handle(
     "behavior:feedback",
     async (_event, input = {}, appName = DEFAULT_APP_NAME) => {
       const graph = loadGraph(appName);
@@ -1716,38 +1685,6 @@ app.whenReady().then(async () => {
       return graph;
     },
   );
-
-  ipcMain.handle("demo:controlledWorkflow", async () => {
-    const { display } = getSummonDisplay();
-    moveOverlayToDisplay(display);
-
-    if (!mainWindow || mainWindow.isDestroyed()) {
-      createWindow();
-    }
-
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      movePracticeWindowToDisplay(display, true);
-    }
-
-    const workflow = createControlledDemoWorkflow(mainWindow);
-    const graph = saveToNode(
-      loadGraph(DEFAULT_APP_NAME),
-      workflow.nodeId,
-      workflow.steps,
-    );
-    saveGraph(graph);
-    safeLog("[DEMO] controlled workflow prepared", {
-      nodeId: workflow.nodeId,
-      totalSteps: workflow.steps.length,
-      steps: workflow.steps.map((step) => ({
-        id: step.id,
-        action: step.action,
-        x: step.x,
-        y: step.y,
-      })),
-    });
-    return workflow;
-  });
 
   ipcMain.handle(
     "session:mark-complete",

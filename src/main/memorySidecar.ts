@@ -3,7 +3,11 @@ import { existsSync } from "fs";
 import { join } from "path";
 import { safeLog, safeError } from "./logger";
 
-export const DEFAULT_WIKI_ROOT = "./demo-workflows/event-recap/wiki";
+// User's real GhostWiki directory under Application Support (created on first run)
+export const DEFAULT_WIKI_ROOT = (() => {
+  const home = process.env.HOME || process.env.USERPROFILE || ".";
+  return join(home, "Library/Application Support/Specter/GhostWiki");
+})();
 
 export function memoryServicePort(): string {
   return process.env.MEMORY_SERVICE_PORT || "8765";
