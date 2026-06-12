@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { Button, IconButton, Input } from "@openuidev/react-ui";
 import { MicRecorder } from "./MicRecorder";
 import { RecordingOverlay } from "./RecordingOverlay";
 
@@ -300,27 +301,27 @@ export const InputBar: React.FC<InputBarProps> = ({
           onMouseLeave={onRecordingOverlayMouseLeave}
         />
       )}
-      <div className={`input-bar ${disabled ? "is-disabled" : ""}`}>
+      <div className={`input-bar openui-input-bar ${disabled ? "is-disabled" : ""}`}>
         <div className="input-bar-brand" title="Specter" aria-hidden="true">
           <SpecterMarkIcon />
         </div>
-        <input
+        <Input
           ref={inputRef}
           autoFocus
-          className="input-bar-field"
+          className="input-bar-field openui-input-field"
           type="text"
           placeholder="Ask Specter about the app in front of you"
           value={value}
           disabled={disabled}
+          size="medium"
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={onFocus}
           onBlur={onBlur}
         />
         <div className="input-bar-actions">
-          <button
-            type="button"
-            className={`input-bar-icon-button input-bar-mic-button ${
+          <IconButton
+            className={`input-bar-mic-button ${
               micState === "recording"
                 ? "is-live"
                 : micState === "transcribing"
@@ -328,13 +329,16 @@ export const InputBar: React.FC<InputBarProps> = ({
                   : "is-muted"
             }`}
             disabled={disabled || micState === "transcribing"}
-            onClick={() => {
-              if (micState === "recording") {
-                void handleConfirm();
-              } else if (micState === "idle") {
-                void startRecording();
-              }
-            }}
+            variant={micState === "recording" ? "primary" : "secondary"}
+            size="small"
+            shape="circle"
+            icon={
+              micState === "recording" || micState === "transcribing" ? (
+                <MicrophoneIcon />
+              ) : (
+                <MicrophoneMutedIcon />
+              )
+            }
             aria-label={
               micState === "recording"
                 ? "Microphone live — click to stop and transcribe"
@@ -349,36 +353,38 @@ export const InputBar: React.FC<InputBarProps> = ({
                   ? "Transcribing..."
                   : "Mic muted — click to talk"
             }
-          >
-            {micState === "recording" || micState === "transcribing" ? (
-              <MicrophoneIcon />
-            ) : (
-              <MicrophoneMutedIcon />
-            )}
-          </button>
+            onClick={() => {
+              if (micState === "recording") {
+                void handleConfirm();
+              } else if (micState === "idle") {
+                void startRecording();
+              }
+            }}
+          />
           {onNewChat && (
-            <button
-              type="button"
+            <Button
+              variant="tertiary"
+              size="small"
               className="input-bar-new-chat"
               disabled={disabled}
               onClick={handleNewChat}
+              iconRight={<ChevronDownIcon />}
               aria-label="Start a new prompt"
-              title="Start a new prompt"
             >
-              <span>New prompt</span>
-              <ChevronDownIcon />
-            </button>
+              New prompt
+            </Button>
           )}
-          <button
-            type="button"
+          <IconButton
             className="input-bar-send-button"
             disabled={!canSubmit}
-            onClick={submitValue}
+            variant="primary"
+            size="small"
+            shape="circle"
+            icon={<SendArrowIcon />}
             aria-label="Send message"
             title="Send message"
-          >
-            <SendArrowIcon />
-          </button>
+            onClick={submitValue}
+          />
         </div>
         {micMessage && (
           <div className="input-bar-mic-message">{micMessage}</div>

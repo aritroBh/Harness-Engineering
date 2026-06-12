@@ -16,7 +16,6 @@ process.env.SPECTER_PROFILE_PATH = join(
   "profiles.json",
 );
 
-/* eslint-disable import/first */
 import {
   getProfile,
   setProfile,

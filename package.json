@@ -17,6 +17,9 @@
     "build:mac": "npm run build && electron-builder --mac",
     "build:linux": "npm run build && electron-builder --linux",
     "test:specter": "npx ts-node scripts/test-specter.ts",
+    "test:splitscreen": "npx ts-node scripts/test-splitscreen.ts",
+    "test:step-history": "npx ts-node --transpile-only scripts/test-step-history.ts",
+    "verify:openui": "npm run build && npx ts-node --transpile-only scripts/verify-openui.ts",
     "test:live-ghost": "npx ts-node --transpile-only scripts/test-live-ghost-unit.ts",
     "test:ultra-grounding": "npx ts-node --transpile-only scripts/test-ultra-live-target-grounding.ts",
     "security-check": "npx ts-node scripts/security-check.ts",
@@ -35,16 +38,21 @@
     "graphify:setup": "bash scripts/setup-graphify.sh",
     "graphify:build": "graphify build .",
     "graphify:update": "graphify auto-update .",
-    "stress:context": "npx ts-node --transpile-only scripts/stress-test-context.ts"
+    "stress:context": "npx ts-node --transpile-only scripts/stress-test-context.ts",
+    "test:memory": "npx ts-node --transpile-only scripts/test-memory-integration.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.0",
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@nut-tree-fork/nut-js": "^4.2.1",
+    "@openuidev/react-headless": "^0.8.2",
+    "@openuidev/react-lang": "^0.2.6",
+    "@openuidev/react-ui": "^0.11.8",
     "dotenv": "^16.4.7",
     "openai": "^4.76.0",
-    "uiohook-napi": "^1.5.3"
+    "uiohook-napi": "^1.5.3",
+    "zod": "^4.4.3"
   },
   "optionalDependencies": {
     "node-mac-permissions": "^2.5.0"

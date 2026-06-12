@@ -1,17 +1,29 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { api } from "./api";
-import { InputBar } from "../overlay/InputBar";
 import { GhostCursor } from "../overlay/GhostCursor";
 import { GhostActionPlayer } from "../overlay/GhostActionPlayer";
 import { WalkthroughGuide } from "../overlay/WalkthroughGuide";
 import { SpecBuddy } from "../overlay/SpecBuddy";
 import { ModeToggle } from "../overlay/ModeToggle";
 import { SessionPanel } from "../overlay/SessionPanel";
+import { ProgressTracker, type AgentActionEvent } from "../overlay/ProgressTracker";
+import { SpecterWorkflowButton } from "../overlay/SpecterWorkflowButton";
+import {
+  buildStepHistory,
+  computeStepProgress,
+  markCompletedUpTo,
+  upsertStepInstruction,
+} from "../overlay/stepHistory";
 
 import { GhostWikiPanel } from "../overlay/GhostWikiPanel";
 
 import { UltraState } from "../overlay/UltraReplyBubble";
-import { ChatThread } from "../overlay/ChatThread";
 import { TargetPreviewGhost } from "../overlay/TargetPreviewGhost";
 import { usePerimeterRoam } from "../overlay/usePerimeterRoam";
 import { VoiceMicButton } from "../overlay/VoiceMicButton";
@@ -31,11 +43,6 @@ type RealAppAction = "click" | "type" | "scroll" | "wait";
 type EdgeLightState = "hidden" | "summon" | "idle" | "walkthrough";
 type MirrorFeedbackKind = "accept" | "override" | "hesitation" | "correction";
 type CoordinateFrame = "viewport" | "capture" | "practice-window" | "manual";
-
-interface HudPosition {
-  left: number;
-  top: number;
-}
 
 interface RealAppTarget {
   id?: string;
@@ -97,7 +104,6 @@ const DEFAULT_REAL_APP_PROMPT = "Teach me one visible action";
 const DEFAULT_CONFIDENCE_THRESHOLD = 0.65;
 const NORMAL_TARGET_LIMIT = 3;
 const DEBUG_TARGET_LIMIT = 10;
-const HUD_VIEWPORT_MARGIN = 12;
 const CURSOR_REVEAL_POLL_MS = 70;
 const NEAR_TARGET_REVEAL_DISTANCE_PX = 180;
 const IDLE_REVEAL_RADIUS = 110;
@@ -106,26 +112,6 @@ const NEAR_TARGET_REVEAL_RADIUS = 210;
 const IDLE_REVEAL_STRENGTH = 0.28;
 const WALKTHROUGH_REVEAL_STRENGTH = 0.48;
 const NEAR_TARGET_REVEAL_STRENGTH = 0.72;
-
-function clampHudPosition(
-  position: HudPosition,
-  width: number,
-  height: number,
-): HudPosition {
-  const maxLeft = Math.max(
-    HUD_VIEWPORT_MARGIN,
-    window.innerWidth - width - HUD_VIEWPORT_MARGIN,
-  );
-  const maxTop = Math.max(
-    HUD_VIEWPORT_MARGIN,
-    window.innerHeight - height - HUD_VIEWPORT_MARGIN,
-  );
-
-  return {
-    left: Math.min(maxLeft, Math.max(HUD_VIEWPORT_MARGIN, position.left)),
-    top: Math.min(maxTop, Math.max(HUD_VIEWPORT_MARGIN, position.top)),
-  };
-}
 
 function messageFromError(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
@@ -402,6 +388,7 @@ const OverlayApp: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<any>(null);
   const [replayState, setReplayState] = useState<ReplayState>("idle");
   const [replayMode, setReplayMode] = useState<ReplayMode>(null);
+  const [agentActions, setAgentActions] = useState<AgentActionEvent[]>([]);
   const [guideReady, setGuideReady] = useState(false);
   const guideReadyTimerRef = useRef<number | null>(null);
   const [liveGhostStep, setLiveGhostStep] = useState<any>(null);
@@ -451,6 +438,19 @@ const OverlayApp: React.FC = () => {
     BehavioralCheckpoint[]
   >([]);
   const [hasCompletedWalkthrough, setHasCompletedWalkthrough] = useState(false);
+  const [railExpanded, setRailExpanded] = useState(true);
+  const [stepInstructions, setStepInstructions] = useState<Map<number, string>>(
+    new Map(),
+  );
+  const [correctedStepIndices, setCorrectedStepIndices] = useState<Set<number>>(
+    new Set(),
+  );
+  const [completedStepIndices, setCompletedStepIndices] = useState<Set<number>>(
+    new Set(),
+  );
+  const [sessionStepTotal, setSessionStepTotal] = useState(0);
+  const [sessionCurrentIndex, setSessionCurrentIndex] = useState(0);
+  const [sessionComplete, setSessionComplete] = useState(false);
   const [activeCheckpoint, setActiveCheckpoint] =
     useState<BehavioralCheckpoint | null>(null);
   const [blendedPreview, setBlendedPreview] = useState<BehavioralState | null>(
@@ -474,13 +474,14 @@ const OverlayApp: React.FC = () => {
     "elevenlabs" | "openai" | "macos" | null
   >(null);
   const [screenState, setScreenState] = useState<any>(null);
-  const [isInputFocused, setIsInputFocused] = useState(false);
+  // No text input remains — voice only. Kept as a constant so the
+  // click-through guard logic stays intact.
+  const [isInputFocused] = useState(false);
   const [isClickThrough, setIsClickThrough] = useState(true);
-  const [hudPosition, setHudPosition] = useState<HudPosition | null>(null);
-  const [isHudDragging, setIsHudDragging] = useState(false);
+  // Rail is fixed to the right edge now; HUD dragging is retired.
+  const [isHudDragging] = useState(false);
   const [summonSettled, setSummonSettled] = useState(false);
   const hudRef = useRef<HTMLDivElement | null>(null);
-  const hudDragOffsetRef = useRef({ x: 0, y: 0 });
   const isHudHoveredRef = useRef(false);
   const isHudDraggingRef = useRef(false);
   const isInputFocusedRef = useRef(false);
@@ -496,11 +497,7 @@ const OverlayApp: React.FC = () => {
     !isManualTargetPicking;
   const specBuddyRoamEnabled =
     (isVisible || isReplayActiveForRoam || isLoading) &&
-    !(
-      roamShowWorkflowCard &&
-      selectedRealAppTarget &&
-      !isReplayActiveForRoam
-    );
+    !(roamShowWorkflowCard && selectedRealAppTarget && !isReplayActiveForRoam);
   const specBuddyRoam = usePerimeterRoam(
     specBuddyRoamEnabled,
     '[data-specter-boundary="true"]',
@@ -601,7 +598,10 @@ const OverlayApp: React.FC = () => {
 
             await new Promise<void>((resolve) => {
               const poll = setInterval(() => {
-                if (listenCtx.cancelled || Date.now() - startedAt >= MAX_LISTEN_MS) {
+                if (
+                  listenCtx.cancelled ||
+                  Date.now() - startedAt >= MAX_LISTEN_MS
+                ) {
                   clearInterval(poll);
                   resolve();
                   return;
@@ -622,7 +622,10 @@ const OverlayApp: React.FC = () => {
                     silenceStartAt = null;
                   } else if (speechDetected) {
                     if (!silenceStartAt) silenceStartAt = Date.now();
-                    else if (Date.now() - silenceStartAt >= SILENCE_CONFIRM_MS) {
+                    else if (
+                      Date.now() - silenceStartAt >=
+                      SILENCE_CONFIRM_MS
+                    ) {
                       clearInterval(poll);
                       resolve();
                     }
@@ -636,7 +639,9 @@ const OverlayApp: React.FC = () => {
               return;
             }
 
-            const buffer = await recorder.stop().catch(() => new ArrayBuffer(0));
+            const buffer = await recorder
+              .stop()
+              .catch(() => new ArrayBuffer(0));
 
             if (!buffer.byteLength || !speechDetected) {
               ghostListenAbortRef.current = null;
@@ -800,7 +805,7 @@ const OverlayApp: React.FC = () => {
         setLiveGhostLeaving(false);
         liveGhostLeaveTimerRef.current = null;
       }, 200);
-    }, 6000);
+    }, 12_000);
   };
 
   const applyLiveTargetFromResult = async (result: any) => {
@@ -855,9 +860,31 @@ const OverlayApp: React.FC = () => {
     }
   };
 
+  // Explicit "do it on screen" phrasing skips the chat round-trip and goes
+  // straight to target detection; everything else is a conversation turn and
+  // Claude decides whether to escalate to a walkthrough.
+  const WALKTHROUGH_FAST_PATH =
+    /^(walk me through|teach me|show me how|show me|guide me|demonstrate|help me (do|click|open|create|make))/i;
+
   const handleUltraSpokenInput = async (text: string) => {
     cancelGhostListen();
-    if (mode !== "ultra" && !demoPresentationMode) return;
+    // Voice is the only input surface — spoken input is always accepted.
+    const requestedText = text.trim();
+    if (!requestedText) return;
+
+    // Fast paths that used to live on the typed-input handler now apply to
+    // speech too: note compilation and explicit "do it on screen" phrasing.
+    if (isNoteHtmlCompilationIntent(requestedText)) {
+      await runNoteHtmlAgent(requestedText);
+      return;
+    }
+    if (
+      WALKTHROUGH_FAST_PATH.test(requestedText) &&
+      !demoPresentationRef.current
+    ) {
+      await startRealAppTest(requestedText);
+      return;
+    }
 
     const gen = ++converseGenRef.current;
     clearLiveGhost();
@@ -866,7 +893,10 @@ const OverlayApp: React.FC = () => {
 
     // Show the user's turn immediately; the closure below still sends the
     // pre-append history to the model, so the current message isn't doubled.
-    setUltraSessionHistory((prev) => [...prev, { role: "user", content: text }]);
+    setUltraSessionHistory((prev) => [
+      ...prev,
+      { role: "user", content: text },
+    ]);
 
     const timeout = setTimeout(() => {
       console.warn("[ULTRA] converse timeout");
@@ -971,118 +1001,6 @@ const OverlayApp: React.FC = () => {
     }
   };
 
-  // Conversational ghost: any typed input becomes a chat turn with Claude.
-  // Memory service is consulted in parallel (capped at 2.5s) so past-session
-  // knowledge flavors the reply without blocking it.
-  const handleChatInput = async (text: string) => {
-    const gen = ++converseGenRef.current;
-    clearLiveGhost();
-    setUltraState("thinking");
-
-    // Show the user's turn immediately; the closure below still sends the
-    // pre-append history to the model, so the current message isn't doubled.
-    setUltraSessionHistory((prev) => [...prev, { role: "user", content: text }]);
-
-    const timeout = setTimeout(() => {
-      // Invalidate this generation so a late reply can't speak or rewrite
-      // history after we've already told the user it timed out.
-      converseGenRef.current++;
-      setUltraState("waitingForUser");
-      setErrorMessage("Specter is taking too long to respond. Try again.");
-      setUltraSessionHistory((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "That took too long on my end — try asking again.",
-        },
-      ]);
-    }, 20_000);
-
-    setMemorySearchActive(true);
-    const memoryPromise: Promise<string | null> = Promise.race([
-      api
-        .ghostwikiQuery(text)
-        .then((res: any) =>
-          res?.ok && typeof res.answer === "string" && res.answer.trim()
-            ? String(res.answer).slice(0, 600)
-            : null,
-        )
-        .catch(() => null),
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
-    ]);
-
-    try {
-      const memoryContext = await memoryPromise;
-      setMemorySearchActive(false);
-      const result = await api.ultraConverse({
-        message: text,
-        mode,
-        currentGoal: intent,
-        currentStep,
-        screenState,
-        sessionHistory: ultraSessionHistory,
-        memoryContext,
-      });
-      clearTimeout(timeout);
-
-      // Stale generation: a newer message or the timeout already took over.
-      if (gen !== converseGenRef.current) return;
-
-      const reply =
-        typeof result.reply === "string" && result.reply.trim()
-          ? result.reply
-          : "I didn't come up with a useful reply there. Ask me again?";
-
-      setUltraSessionHistory((prev) => [
-        ...prev,
-        { role: "assistant", content: reply },
-      ]);
-
-      if (modeRef.current === "ultra" && result.shouldSpeak) {
-        speakIfUltra(reply, "chat reply");
-      } else if (demoPresentationRef.current) {
-        speakIfUltra(reply, "demo chat reply");
-      } else {
-        setUltraState("waitingForUser");
-      }
-
-      const wantsWalkthrough =
-        result.intent === "start_walkthrough" ||
-        result.shouldStartWalkthrough ||
-        HOW_TO_PATTERN.test(text);
-      if (wantsWalkthrough && !currentStep && replayState === "idle") {
-        if (demoPresentationRef.current) {
-          // Demo mode: replay the saved workflow so the ghost visibly moves.
-          void startDemoWalkthrough();
-        } else if (
-          result.intent === "start_walkthrough" ||
-          result.shouldStartWalkthrough
-        ) {
-          await startRealAppTest(text);
-        }
-      }
-
-      if (gen === converseGenRef.current) {
-        await applyLiveTargetFromResult(result);
-      }
-    } catch (error) {
-      clearTimeout(timeout);
-      setMemorySearchActive(false);
-      console.error("[CHAT] converse error", error);
-      if (gen === converseGenRef.current) {
-        setUltraSessionHistory((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: "Something went wrong on my end — try that again.",
-          },
-        ]);
-      }
-      setUltraState("error");
-      setTimeout(() => setUltraState("waitingForUser"), 3000);
-    }
-  };
-
   useEffect(() => {
     isInputFocusedRef.current = isInputFocused;
   }, [isInputFocused]);
@@ -1097,21 +1015,6 @@ const OverlayApp: React.FC = () => {
     const timer = window.setTimeout(() => setSummonSettled(true), 1100);
     return () => window.clearTimeout(timer);
   }, [isVisible]);
-
-  useEffect(() => {
-    const clampToViewport = () => {
-      const hud = hudRef.current;
-      if (!hud) return;
-
-      const rect = hud.getBoundingClientRect();
-      setHudPosition((current) =>
-        current ? clampHudPosition(current, rect.width, rect.height) : current,
-      );
-    };
-
-    window.addEventListener("resize", clampToViewport);
-    return () => window.removeEventListener("resize", clampToViewport);
-  }, []);
 
   useEffect(() => {
     const shouldTrackCursor =
@@ -1204,8 +1107,12 @@ const OverlayApp: React.FC = () => {
 
   // Overlay visibility + replay lifecycle events
   useEffect(() => {
-    const offToggle = api.onOverlayToggle(() => {
-      setIsVisible((prev) => !prev);
+    // Main sends explicit visibility state (not a blind toggle) so renderer
+    // state can never invert against the actual window — the old toggle
+    // pattern desynced whenever main showed/hid the window on its own and
+    // was one reason the ghost never appeared.
+    const offToggle = api.onOverlayVisibility?.((data: any) => {
+      setIsVisible(Boolean(data?.visible));
     });
 
     const offComplete = api.onReplayComplete(() => {
@@ -1214,6 +1121,15 @@ const OverlayApp: React.FC = () => {
       setReplayMode(null);
       setManualConfirmMessage("");
       setHasCompletedWalkthrough(true);
+      setSessionComplete(true);
+      setSessionStepTotal((total) => {
+        if (total > 0) {
+          setCompletedStepIndices(markCompletedUpTo(new Set(), total));
+          setSessionCurrentIndex(total);
+        }
+        return total;
+      });
+      setRailExpanded(true);
       setSpecMood("celebrating");
       if (modeRef.current === "ultra") {
         setUltraState("idle");
@@ -1225,6 +1141,7 @@ const OverlayApp: React.FC = () => {
       setReplayState("idle");
       setReplayMode(null);
       setManualConfirmMessage("");
+      setSessionComplete(false);
       setSpecMood("idle");
       if (modeRef.current === "ultra") {
         setUltraState("idle");
@@ -1253,7 +1170,7 @@ const OverlayApp: React.FC = () => {
     });
 
     return () => {
-      offToggle();
+      offToggle?.();
       offComplete();
       offStopped();
       offConfirmNeeded();
@@ -1619,9 +1536,17 @@ const OverlayApp: React.FC = () => {
   // Listen for walkthrough step events (clears loading once first step fires)
   useEffect(() => {
     const offStep = api.onReplayStep((data: any) => {
-      setCurrentStep(walkthroughStepFromReplay(data));
+      const step = walkthroughStepFromReplay(data);
+      setCurrentStep(step);
       setReplayMode("walkthrough");
       setReplayState("running");
+      setSessionComplete(false);
+      setSessionStepTotal(data.total ?? step.total ?? 0);
+      setSessionCurrentIndex(data.index ?? step.index ?? 0);
+      setCompletedStepIndices((prev) =>
+        markCompletedUpTo(prev, data.index ?? step.index ?? 0),
+      );
+      setRailExpanded(true);
       setIsLoading(false);
       setSpecMood("thinking");
 
@@ -1632,9 +1557,12 @@ const OverlayApp: React.FC = () => {
     });
 
     const offRetry = api.onReplayRetry((data: any) => {
-      setCurrentStep(walkthroughStepFromReplay(data));
+      const step = walkthroughStepFromReplay(data);
+      setCurrentStep(step);
       setReplayMode("walkthrough");
       setReplayState("running");
+      setSessionStepTotal(data.total ?? step.total ?? 0);
+      setSessionCurrentIndex(data.index ?? step.index ?? 0);
       setIsLoading(false);
       setSpecMood("judging");
     });
@@ -1666,6 +1594,13 @@ const OverlayApp: React.FC = () => {
     const offProgress = api.onReplayProgress((data: any) => {
       setReplayState("running");
       setReplayMode("auto");
+      setSessionComplete(false);
+      setSessionStepTotal(data.total ?? 0);
+      setSessionCurrentIndex(data.index ?? 0);
+      setCompletedStepIndices((prev) =>
+        markCompletedUpTo(prev, data.index ?? 0),
+      );
+      setRailExpanded(true);
       // Spread step coords so GhostActionPlayer can glide alongside the real
       // mouse; without x/y it renders nothing during auto/mirror replay.
       setCurrentStep(
@@ -1680,6 +1615,17 @@ const OverlayApp: React.FC = () => {
       offProgress();
     };
   }, [mirrorStatus]);
+
+  // Live agent-action feed for the right rail
+  useEffect(() => {
+    const offAction = api.onReplayAction?.((event: AgentActionEvent) => {
+      setAgentActions((prev) => {
+        const next = [...prev, event].slice(-20);
+        return next;
+      });
+    });
+    return () => offAction?.();
+  }, []);
 
   const runLegacyPlannerFlow = async (text: string) => {
     const trimmed = text.trim();
@@ -1778,6 +1724,12 @@ const OverlayApp: React.FC = () => {
     );
     setReplayMode(kind);
     setReplayState("running");
+    setSessionComplete(false);
+    setCompletedStepIndices(new Set());
+    setCorrectedStepIndices(new Set());
+    setSessionCurrentIndex(0);
+    setSessionStepTotal(0);
+    setRailExpanded(true);
 
     let automationArmed = false;
     try {
@@ -1896,30 +1848,6 @@ const OverlayApp: React.FC = () => {
       setReplayMode(null);
       setIsLoading(false);
     }
-  };
-
-  // Explicit "do it on screen" phrasing skips the chat round-trip and goes
-  // straight to target detection; everything else is a conversation turn and
-  // Claude decides whether to escalate to a walkthrough.
-  const WALKTHROUGH_FAST_PATH =
-    /^(walk me through|teach me|show me how|show me|guide me|demonstrate|help me (do|click|open|create|make))/i;
-
-  const handleInputSubmit = async (text: string) => {
-    const requestedText = text.trim() || intent.trim();
-    if (!requestedText) return;
-    if (isNoteHtmlCompilationIntent(requestedText)) {
-      await runNoteHtmlAgent(requestedText);
-      return;
-    }
-    if (WALKTHROUGH_FAST_PATH.test(requestedText)) {
-      // Demo mode: chat answers AND the saved-workflow ghost replay handles
-      // the visual walkthrough; vision-based real-app detection is skipped.
-      if (!demoPresentationRef.current) {
-        await startRealAppTest(requestedText);
-        return;
-      }
-    }
-    await handleChatInput(requestedText);
   };
 
   const startRealAppTest = async (text: string) => {
@@ -2426,60 +2354,6 @@ const OverlayApp: React.FC = () => {
     }
   };
 
-  const startHudDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-
-    const hud = hudRef.current;
-    if (!hud) return;
-
-    const rect = hud.getBoundingClientRect();
-    hudDragOffsetRef.current = {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    };
-    isHudDraggingRef.current = true;
-    setIsHudDragging(true);
-    setHudPosition({ left: rect.left, top: rect.top });
-    setInteractivity(true);
-    event.preventDefault();
-    event.stopPropagation();
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-
-  const moveHudDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!isHudDraggingRef.current) return;
-
-    const hud = hudRef.current;
-    if (!hud) return;
-
-    const rect = hud.getBoundingClientRect();
-    const nextPosition = {
-      left: event.clientX - hudDragOffsetRef.current.x,
-      top: event.clientY - hudDragOffsetRef.current.y,
-    };
-    setHudPosition(clampHudPosition(nextPosition, rect.width, rect.height));
-  };
-
-  const stopHudDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!isHudDraggingRef.current) return;
-
-    isHudDraggingRef.current = false;
-    setIsHudDragging(false);
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-
-    if (isHudHoveredRef.current) {
-      setInteractivity(true);
-    } else {
-      setInteractivity(false);
-    }
-  };
-
-  const resetHudPosition = () => {
-    setHudPosition(null);
-  };
-
   const startNewChat = () => {
     setIntent("");
     setRealAppIntent("");
@@ -2596,19 +2470,6 @@ const OverlayApp: React.FC = () => {
   ]
     .filter(Boolean)
     .join(" ");
-  const hudStyle: React.CSSProperties = hudPosition
-    ? {
-        position: "absolute",
-        left: `${hudPosition.left}px`,
-        top: `${hudPosition.top}px`,
-      }
-    : {
-        position: "absolute",
-        left: "50%",
-        bottom: "10%",
-        transform: "translateX(-50%)",
-      };
-
   const reasoningLines = useMemo(
     () =>
       buildReasoningLines({
@@ -2652,8 +2513,80 @@ const OverlayApp: React.FC = () => {
     ],
   );
 
-  const showHudShell =
-    !demoPresentationMode || showWorkflowCard || showDebugTools;
+  const isWalkthroughActive =
+    replayState === "running" &&
+    (replayMode === "walkthrough" || replayMode === "auto");
+
+  const activeStepTotal =
+    sessionStepTotal || currentStep?.total || stepInstructions.size || 0;
+  const activeStepIndex = currentStep?.index ?? sessionCurrentIndex ?? 0;
+
+  const stepHistory = useMemo(
+    () =>
+      buildStepHistory({
+        total: activeStepTotal,
+        currentIndex: activeStepIndex,
+        instructions: stepInstructions,
+        correctedIndices: correctedStepIndices,
+        completedIndices: completedStepIndices,
+        sessionComplete,
+      }),
+    [
+      activeStepTotal,
+      activeStepIndex,
+      stepInstructions,
+      correctedStepIndices,
+      completedStepIndices,
+      sessionComplete,
+    ],
+  );
+
+  const stepProgress = computeStepProgress(
+    activeStepTotal,
+    activeStepIndex,
+    completedStepIndices,
+    sessionComplete,
+    currentStep?.ghostLocked === true,
+  );
+
+  const showProgressRail =
+    isVisible || isReplayRunning || isLoading || showWorkflowCard;
+
+  useEffect(() => {
+    if (!currentStep) return;
+    const instruction =
+      currentStep.instruction || currentStep.targetLabel || "";
+    const index = currentStep.index ?? 0;
+    if (!instruction) return;
+    setStepInstructions((prev) =>
+      upsertStepInstruction(prev, index, instruction),
+    );
+  }, [currentStep?.index, currentStep?.instruction, currentStep?.targetLabel]);
+
+  useEffect(() => {
+    const offSpec = api.onSpecEvent?.((event: { type: string; step?: any }) => {
+      if (event.type === "step_corrected" && event.step?.stepId != null) {
+        const idx = Number(event.step.stepId) - 1;
+        setCorrectedStepIndices((prev) => new Set(prev).add(idx));
+      }
+      if (event.type === "step_advanced" && event.step) {
+        const idx = Number(event.step.stepId ?? 1) - 1;
+        const say = event.step.say || "";
+        if (say) {
+          setStepInstructions((prev) => upsertStepInstruction(prev, idx, say));
+        }
+      }
+      if (event.type === "goal_complete") {
+        setSpecMood("celebrating");
+      }
+      if (event.type === "thinking") {
+        setSpecMood("thinking");
+      }
+    });
+    return () => {
+      offSpec?.();
+    };
+  }, []);
 
   useEffect(() => {
     if (!realAppTargets || isManualTargetPicking || isReplayRunning) return;
@@ -2703,449 +2636,472 @@ const OverlayApp: React.FC = () => {
             height: "100vh",
             pointerEvents: "none",
             overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
             background: "transparent",
-            fontFamily: "Inter, system-ui, sans-serif",
+            fontFamily: '"SF Pro Text", "Segoe UI", system-ui, sans-serif',
             transition: "background 0.5s ease",
           } as React.CSSProperties
         }
       >
-        <div className="specter-overlay-wash" />
-        <div
-          className="siri-glow-fullscreen"
-          style={{ pointerEvents: "none" }}
-        />
-        {(() => {
-          const targetPreviewActive = Boolean(
-            showWorkflowCard && selectedRealAppTarget && !isReplayRunning,
-          );
-          const isGhostActionReplay = Boolean(
-            isReplayRunning &&
-            currentStep &&
-            (replayMode === "walkthrough" || replayMode === "auto"),
-          );
-          const isLiveGhostActive = Boolean(!isReplayRunning && liveGhostStep);
-          const guideStep = isGhostActionReplay
-            ? currentStep
-            : isLiveGhostActive
-              ? liveGhostStep
-              : currentStep;
-          return (
-            <>
-              {isGhostActionReplay ? (
-                <GhostActionPlayer
-                  step={currentStep}
-                  isActive={isReplayRunning}
-                  start={roamingGhostPosRef.current}
-                />
-              ) : isLiveGhostActive ? (
-                <div
-                  className={`ghost-live-pop${liveGhostLeaving ? " is-leaving" : ""}`}
-                >
-                  <GhostActionPlayer
-                    step={liveGhostStep}
-                    isActive={true}
-                    start={roamingGhostPosRef.current}
-                  />
-                </div>
-              ) : (
-                <GhostCursor
-                  mood={specMood}
-                  isVisible={
-                    (isVisible || isReplayRunning) && !targetPreviewActive
-                  }
-                  step={currentStep}
-                  isSpeaking={isSpeaking}
-                />
-              )}
-              {isGhostActionReplay || isLiveGhostActive ? (
-                guideReady ? (
-                  <WalkthroughGuide step={guideStep} />
-                ) : null
-              ) : (
-                <WalkthroughGuide step={currentStep} />
-              )}
-              <TargetPreviewGhost
-                target={
-                  selectedRealAppTarget
-                    ? {
-                        x:
-                          selectedRealAppTarget.viewportX ??
-                          selectedRealAppTarget.x,
-                        y:
-                          selectedRealAppTarget.viewportY ??
-                          selectedRealAppTarget.y,
-                        label: selectedRealAppTarget.label,
+        <div className="specter-split-layout">
+          <div className="specter-action-stage">
+            <div className="specter-overlay-wash" />
+            <div
+              className="siri-glow-fullscreen"
+              style={{ pointerEvents: "none" }}
+            />
+            {(() => {
+              const targetPreviewActive = Boolean(
+                showWorkflowCard && selectedRealAppTarget && !isReplayRunning,
+              );
+              const isGhostActionReplay = Boolean(
+                isReplayRunning &&
+                currentStep &&
+                (replayMode === "walkthrough" || replayMode === "auto"),
+              );
+              const isLiveGhostActive = Boolean(
+                !isReplayRunning && liveGhostStep,
+              );
+              const guideStep = isGhostActionReplay
+                ? currentStep
+                : isLiveGhostActive
+                  ? liveGhostStep
+                  : currentStep;
+              return (
+                <>
+                  {isGhostActionReplay ? (
+                    <GhostActionPlayer
+                      step={currentStep}
+                      isActive={isReplayRunning}
+                      start={roamingGhostPosRef.current}
+                    />
+                  ) : isLiveGhostActive ? (
+                    <div
+                      className={`ghost-live-pop${liveGhostLeaving ? " is-leaving" : ""}`}
+                    >
+                      <GhostActionPlayer
+                        step={liveGhostStep}
+                        isActive={true}
+                        start={roamingGhostPosRef.current}
+                      />
+                    </div>
+                  ) : (
+                    <GhostCursor
+                      mood={specMood}
+                      isVisible={
+                        (isVisible || isReplayRunning) && !targetPreviewActive
                       }
-                    : null
-                }
-                start={previewGhostStart || undefined}
-                active={targetPreviewActive}
-              />
-            </>
-          );
-        })()}
-        {(isVisible || isReplayRunning || isLoading) &&
-          !(showWorkflowCard && selectedRealAppTarget && !isReplayRunning) && (
-            <SpecBuddy
-              mood={specMood}
-              state={displayedBehavior || undefined}
-              enabled={isVisible || isReplayRunning || isLoading}
-              roam={specBuddyRoam}
-              checkpointLabel={activeCheckpoint?.label}
-              compact={!showDebugTools && !demoPresentationMode}
-              pitchMode={pitchMode}
-              reasoningLines={demoPresentationMode ? reasoningLines : []}
-            />
-          )}
+                      step={currentStep}
+                      isSpeaking={isSpeaking}
+                    />
+                  )}
+                  {isGhostActionReplay || isLiveGhostActive ? (
+                    guideReady ? (
+                      <WalkthroughGuide step={guideStep} />
+                    ) : null
+                  ) : (
+                    <WalkthroughGuide step={currentStep} />
+                  )}
+                  <TargetPreviewGhost
+                    target={
+                      selectedRealAppTarget
+                        ? {
+                            x:
+                              selectedRealAppTarget.viewportX ??
+                              selectedRealAppTarget.x,
+                            y:
+                              selectedRealAppTarget.viewportY ??
+                              selectedRealAppTarget.y,
+                            label: selectedRealAppTarget.label,
+                          }
+                        : null
+                    }
+                    start={previewGhostStart || undefined}
+                    active={targetPreviewActive}
+                  />
+                </>
+              );
+            })()}
+            {(isVisible || isReplayRunning || isLoading) &&
+              !(
+                showWorkflowCard &&
+                selectedRealAppTarget &&
+                !isReplayRunning
+              ) && (
+                <SpecBuddy
+                  mood={specMood}
+                  state={displayedBehavior || undefined}
+                  enabled={isVisible || isReplayRunning || isLoading}
+                  roam={specBuddyRoam}
+                  checkpointLabel={activeCheckpoint?.label}
+                  compact={!showDebugTools && !demoPresentationMode}
+                  pitchMode={pitchMode}
+                  reasoningLines={demoPresentationMode ? reasoningLines : []}
+                />
+              )}
 
-        {isManualTargetPicking && !isReplayRunning && (
-          <div
-            className="specter-manual-pick-layer"
-            onMouseMove={updateManualPickPoint}
-            onClick={handleManualTargetPick}
-            role="button"
-            aria-label="Pick a manual target"
-          >
-            <div
-              className="specter-manual-pick-reticle"
-              style={{
-                transform: `translate3d(${manualPickPoint.x}px, ${manualPickPoint.y}px, 0) translate(-50%, -50%)`,
-              }}
-            />
-            <div
-              className="specter-manual-pick-card"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <div>
-                <strong>Pick the exact click target</strong>
-                <span>
-                  Click the exact spot you want Specter to teach. Press Escape
-                  to cancel.
-                </span>
-              </div>
-              <button
-                className="specter-manual-pick-cancel"
-                onClick={cancelManualTargetPicking}
+            {isManualTargetPicking && !isReplayRunning && (
+              <div
+                className="specter-manual-pick-layer"
+                onMouseMove={updateManualPickPoint}
+                onClick={handleManualTargetPick}
+                role="button"
+                aria-label="Pick a manual target"
               >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
+                <div
+                  className="specter-manual-pick-reticle"
+                  style={{
+                    transform: `translate3d(${manualPickPoint.x}px, ${manualPickPoint.y}px, 0) translate(-50%, -50%)`,
+                  }}
+                />
+                <div
+                  className="specter-manual-pick-card"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div>
+                    <strong>Pick the exact click target</strong>
+                    <span>
+                      Click the exact spot you want Specter to teach. Press
+                      Escape to cancel.
+                    </span>
+                  </div>
+                  <button
+                    className="specter-manual-pick-cancel"
+                    onClick={cancelManualTargetPicking}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
 
-        {showDebugTools &&
-          displayedRealAppTargets.map((target, index) => {
-            if (!showWorkflowCard || isReplayRunning || isManualTargetPicking) {
-              return null;
-            }
-            const key = realAppTargetKey(target);
-            const isSelected = sameRealAppTarget(selectedRealAppTarget, target);
-            const isHovered = hoveredRealAppTargetKey === key;
-
-            return (
-              <button
-                key={`${key}-${index}`}
-                className={`specter-target-marker ${
-                  isSelected ? "is-selected" : ""
-                } ${isHovered ? "is-hovered" : ""}`}
-                onClick={() => selectRealAppTarget(target)}
-                onMouseEnter={() => setHoveredRealAppTargetKey(key)}
-                onMouseLeave={() => setHoveredRealAppTargetKey("")}
-                aria-label={`Select target ${target.label}`}
-                title={
-                  showDebugTools
-                    ? `${target.label} (${confidencePercent(target.confidence)})`
-                    : target.label
+            {showDebugTools &&
+              displayedRealAppTargets.map((target, index) => {
+                if (
+                  !showWorkflowCard ||
+                  isReplayRunning ||
+                  isManualTargetPicking
+                ) {
+                  return null;
                 }
+                const key = realAppTargetKey(target);
+                const isSelected = sameRealAppTarget(
+                  selectedRealAppTarget,
+                  target,
+                );
+                const isHovered = hoveredRealAppTargetKey === key;
+
+                return (
+                  <button
+                    key={`${key}-${index}`}
+                    className={`specter-target-marker ${
+                      isSelected ? "is-selected" : ""
+                    } ${isHovered ? "is-hovered" : ""}`}
+                    onClick={() => selectRealAppTarget(target)}
+                    onMouseEnter={() => setHoveredRealAppTargetKey(key)}
+                    onMouseLeave={() => setHoveredRealAppTargetKey("")}
+                    aria-label={`Select target ${target.label}`}
+                    title={
+                      showDebugTools
+                        ? `${target.label} (${confidencePercent(target.confidence)})`
+                        : target.label
+                    }
+                    style={{
+                      left: `${Math.round(((target.viewportX ?? target.x) / 100) * window.innerWidth)}px`,
+                      top: `${Math.round(((target.viewportY ?? target.y) / 100) * window.innerHeight)}px`,
+                    }}
+                  >
+                    {index + 1}
+                  </button>
+                );
+              })}
+
+            {selectedRealAppTarget && !isReplayRunning && !showDebugTools && (
+              <div
+                className="preview-endpoint-pulse"
                 style={{
-                  left: `${Math.round(((target.viewportX ?? target.x) / 100) * window.innerWidth)}px`,
-                  top: `${Math.round(((target.viewportY ?? target.y) / 100) * window.innerHeight)}px`,
+                  position: "fixed",
+                  left: `${Math.round(((selectedRealAppTarget.viewportX ?? selectedRealAppTarget.x) / 100) * window.innerWidth)}px`,
+                  top: `${Math.round(((selectedRealAppTarget.viewportY ?? selectedRealAppTarget.y) / 100) * window.innerHeight)}px`,
+                  transform: "translate(-50%, -50%)",
+                  zIndex: 10001,
+                  pointerEvents: "none",
+                }}
+              />
+            )}
+
+            {showDebugTools && selectedRealAppTarget && !isReplayRunning && (
+              <div
+                style={{
+                  position: "fixed",
+                  left: `${Math.round(((selectedRealAppTarget.viewportX ?? selectedRealAppTarget.x) / 100) * window.innerWidth)}px`,
+                  top: `${Math.round(((selectedRealAppTarget.viewportY ?? selectedRealAppTarget.y) / 100) * window.innerHeight)}px`,
+                  transform: "translate(-50%, -50%)",
+                  zIndex: 10001,
+                  width: "54px",
+                  height: "54px",
+                  borderRadius: "999px",
+                  border: "2px solid rgba(48, 209, 88, 0.82)",
+                  background: "rgba(48, 209, 88, 0.14)",
+                  boxShadow: "0 0 0 8px rgba(48, 209, 88, 0.08)",
+                  pointerEvents: "none",
+                }}
+              />
+            )}
+
+            {showDebugTools && selectedRealAppTarget && !isReplayRunning && (
+              <div
+                style={{
+                  position: "fixed",
+                  left: `${Math.min(
+                    Math.round(
+                      ((selectedRealAppTarget.viewportX ??
+                        selectedRealAppTarget.x) /
+                        100) *
+                        window.innerWidth,
+                    ) + 22,
+                    window.innerWidth - 220,
+                  )}px`,
+                  top: `${Math.min(
+                    Math.round(
+                      ((selectedRealAppTarget.viewportY ??
+                        selectedRealAppTarget.y) /
+                        100) *
+                        window.innerHeight,
+                    ) + 22,
+                    window.innerHeight - 116,
+                  )}px`,
+                  zIndex: 10004,
+                  width: "204px",
+                  padding: "9px 10px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255,255,255,0.16)",
+                  background: "rgba(14, 16, 20, 0.86)",
+                  color: "rgba(255,255,255,0.9)",
+                  boxShadow: "0 14px 34px rgba(0,0,0,0.3)",
+                  backdropFilter: "blur(14px)",
+                  pointerEvents: "auto",
                 }}
               >
-                {index + 1}
-              </button>
-            );
-          })}
+                <div style={{ fontSize: "11px", fontWeight: 850 }}>
+                  {selectedRealAppTarget.label}
+                </div>
+                <div
+                  style={{
+                    marginTop: "4px",
+                    fontSize: "10px",
+                    lineHeight: 1.35,
+                    color: "rgba(255,255,255,0.62)",
+                  }}
+                >
+                  {`source ${selectedRealAppTarget.sourceFrame || "viewport"} / ${confidencePercent(selectedRealAppTarget.confidence)}`}
+                  <br />
+                  {`raw ${formatCoordinate(selectedRealAppTarget.rawTarget?.x)} / ${formatCoordinate(selectedRealAppTarget.rawTarget?.y)} -> viewport ${formatCoordinate(selectedRealAppTarget.viewportX ?? selectedRealAppTarget.x)} / ${formatCoordinate(selectedRealAppTarget.viewportY ?? selectedRealAppTarget.y)}`}
+                  <br />
+                  {selectedRealAppTarget.captureMeta
+                    ? `capture ${selectedRealAppTarget.captureMeta.captureBounds.width}x${selectedRealAppTarget.captureMeta.captureBounds.height} / display ${selectedRealAppTarget.captureMeta.displayBounds.width}x${selectedRealAppTarget.captureMeta.displayBounds.height}`
+                    : "capture metadata unavailable"}
+                  <br />
+                  {selectedTargetMapping?.screenPoint
+                    ? `screen ${selectedTargetMapping.screenPoint.x}, ${selectedTargetMapping.screenPoint.y} / display ${selectedTargetMapping.activeDisplay?.id ?? "?"}`
+                    : "screen mapping pending"}
+                </div>
+                <SpecterWorkflowButton
+                  primary
+                  style={{ marginTop: "8px", minHeight: "28px", width: "100%" }}
+                  onClick={startManualTargetPicking}
+                >
+                  Looks wrong? Pick manually
+                </SpecterWorkflowButton>
+              </div>
+            )}
 
-        {selectedRealAppTarget && !isReplayRunning && !showDebugTools && (
-          <div
-            className="preview-endpoint-pulse"
-            style={{
-              position: "fixed",
-              left: `${Math.round(((selectedRealAppTarget.viewportX ?? selectedRealAppTarget.x) / 100) * window.innerWidth)}px`,
-              top: `${Math.round(((selectedRealAppTarget.viewportY ?? selectedRealAppTarget.y) / 100) * window.innerHeight)}px`,
-              transform: "translate(-50%, -50%)",
-              zIndex: 10001,
-              pointerEvents: "none",
-            }}
-          />
-        )}
+            {showWalkthroughDebug && (
+              <div
+                className="walkthrough-debug-pill"
+                style={{
+                  position: "fixed",
+                  top: "12px",
+                  left: "12px",
+                  background: "rgba(18, 18, 22, 0.72)",
+                  color: "rgba(255, 255, 255, 0.92)",
+                  padding: "5px 8px",
+                  borderRadius: "999px",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  letterSpacing: 0,
+                  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.18)",
+                  backdropFilter: "blur(10px)",
+                  pointerEvents: "none",
+                  zIndex: 10001,
+                }}
+              >
+                {`STEP ${(currentStep.index ?? 0) + 1}/${currentStep.total ?? "?"}  X ${formatCoordinate(currentStep.x)}  Y ${formatCoordinate(currentStep.y)}`}
+              </div>
+            )}
 
-        {showDebugTools && selectedRealAppTarget && !isReplayRunning && (
-          <div
-            style={{
-              position: "fixed",
-              left: `${Math.round(((selectedRealAppTarget.viewportX ?? selectedRealAppTarget.x) / 100) * window.innerWidth)}px`,
-              top: `${Math.round(((selectedRealAppTarget.viewportY ?? selectedRealAppTarget.y) / 100) * window.innerHeight)}px`,
-              transform: "translate(-50%, -50%)",
-              zIndex: 10001,
-              width: "54px",
-              height: "54px",
-              borderRadius: "999px",
-              border: "2px solid rgba(48, 209, 88, 0.82)",
-              background: "rgba(48, 209, 88, 0.14)",
-              boxShadow: "0 0 0 8px rgba(48, 209, 88, 0.08)",
-              pointerEvents: "none",
-            }}
-          />
-        )}
+            {import.meta.env.DEV && isReplayRunning && currentStep && (
+              <div
+                style={{
+                  position: "fixed",
+                  top: "12px",
+                  right: "12px",
+                  background: "rgba(18, 18, 22, 0.72)",
+                  color: "rgba(255, 255, 255, 0.92)",
+                  padding: "5px 8px",
+                  borderRadius: "999px",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  letterSpacing: 0,
+                  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.18)",
+                  backdropFilter: "blur(10px)",
+                  pointerEvents: "none",
+                  zIndex: 10001,
+                }}
+              >
+                {`click-through: ${isClickThrough ? "ON" : "OFF"} | step ${(currentStep.index ?? 0) + 1}/${currentStep.total ?? "?"} | target X ${formatCoordinate(currentStep.x)} Y ${formatCoordinate(currentStep.y)} | waiting: ${manualConfirmMessage ? "fallback" : currentStep.ghostLocked ? "click" : "approach"}`}
+              </div>
+            )}
 
-        {showDebugTools && selectedRealAppTarget && !isReplayRunning && (
-          <div
-            style={{
-              position: "fixed",
-              left: `${Math.min(
-                Math.round(
-                  ((selectedRealAppTarget.viewportX ?? selectedRealAppTarget.x) /
-                    100) *
-                    window.innerWidth,
-                ) + 22,
-                window.innerWidth - 220,
-              )}px`,
-              top: `${Math.min(
-                Math.round(
-                  ((selectedRealAppTarget.viewportY ?? selectedRealAppTarget.y) /
-                    100) *
-                    window.innerHeight,
-                ) + 22,
-                window.innerHeight - 116,
-              )}px`,
-              zIndex: 10004,
-              width: "204px",
-              padding: "9px 10px",
-              borderRadius: "12px",
-              border: "1px solid rgba(255,255,255,0.16)",
-              background: "rgba(14, 16, 20, 0.86)",
-              color: "rgba(255,255,255,0.9)",
-              boxShadow: "0 14px 34px rgba(0,0,0,0.3)",
-              backdropFilter: "blur(14px)",
-              pointerEvents: "auto",
-            }}
-          >
-            <div style={{ fontSize: "11px", fontWeight: 850 }}>
-              {selectedRealAppTarget.label}
-            </div>
-            <div
-              style={{
-                marginTop: "4px",
-                fontSize: "10px",
-                lineHeight: 1.35,
-                color: "rgba(255,255,255,0.62)",
-              }}
-            >
-              {`source ${selectedRealAppTarget.sourceFrame || "viewport"} / ${confidencePercent(selectedRealAppTarget.confidence)}`}
-              <br />
-              {`raw ${formatCoordinate(selectedRealAppTarget.rawTarget?.x)} / ${formatCoordinate(selectedRealAppTarget.rawTarget?.y)} -> viewport ${formatCoordinate(selectedRealAppTarget.viewportX ?? selectedRealAppTarget.x)} / ${formatCoordinate(selectedRealAppTarget.viewportY ?? selectedRealAppTarget.y)}`}
-              <br />
-              {selectedRealAppTarget.captureMeta
-                ? `capture ${selectedRealAppTarget.captureMeta.captureBounds.width}x${selectedRealAppTarget.captureMeta.captureBounds.height} / display ${selectedRealAppTarget.captureMeta.displayBounds.width}x${selectedRealAppTarget.captureMeta.displayBounds.height}`
-                : "capture metadata unavailable"}
-              <br />
-              {selectedTargetMapping?.screenPoint
-                ? `screen ${selectedTargetMapping.screenPoint.x}, ${selectedTargetMapping.screenPoint.y} / display ${selectedTargetMapping.activeDisplay?.id ?? "?"}`
-                : "screen mapping pending"}
-            </div>
-            <button
-              className="specter-action-button blue"
-              style={{ marginTop: "8px", minHeight: "28px", width: "100%" }}
-              onClick={startManualTargetPicking}
-            >
-              Looks wrong? Pick manually
-            </button>
+            {isLoading && !demoPresentationMode && (
+              <div
+                style={{
+                  position: "fixed",
+                  bottom: "24px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "rgba(0, 0, 0, 0.75)",
+                  color: "#fff",
+                  padding: "10px 20px",
+                  borderRadius: "20px",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  backdropFilter: "blur(8px)",
+                  pointerEvents: "none",
+                  zIndex: 9999,
+                }}
+              >
+                {loadingMessage}
+              </div>
+            )}
+
+            {errorMessage && (
+              <div
+                style={{
+                  position: "fixed",
+                  top: "24px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "rgba(180, 32, 42, 0.88)",
+                  color: "#fff",
+                  padding: "10px 16px",
+                  borderRadius: "16px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  maxWidth: "min(620px, calc(100vw - 32px))",
+                  textAlign: "center",
+                  backdropFilter: "blur(10px)",
+                  pointerEvents: "none",
+                  zIndex: 10000,
+                }}
+              >
+                {errorMessage}
+              </div>
+            )}
+
+            {agentStatusMessage && !errorMessage && (
+              <div
+                style={{
+                  position: "fixed",
+                  top: "24px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "rgba(22, 126, 78, 0.9)",
+                  color: "#fff",
+                  padding: "10px 16px",
+                  borderRadius: "16px",
+                  fontSize: "13px",
+                  fontWeight: 650,
+                  maxWidth: "min(760px, calc(100vw - 32px))",
+                  textAlign: "center",
+                  overflowWrap: "anywhere",
+                  backdropFilter: "blur(10px)",
+                  pointerEvents: "none",
+                  zIndex: 10000,
+                }}
+              >
+                {agentStatusMessage}
+              </div>
+            )}
+
+            {isReplayRunning && (
+              <div
+                style={{
+                  position: "fixed",
+                  bottom: "24px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "rgba(20, 20, 24, 0.76)",
+                  color: "#fff",
+                  padding: "9px 14px",
+                  borderRadius: "16px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  maxWidth: "min(520px, calc(100vw - 32px))",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.22)",
+                  backdropFilter: "blur(10px)",
+                  pointerEvents: "none",
+                  zIndex: 9999,
+                }}
+              >
+                {statusText}
+              </div>
+            )}
+
+            {manualConfirmMessage && (
+              <div
+                style={{
+                  position: "fixed",
+                  bottom: "72px",
+                  left: "24px",
+                  transform: "none",
+                  background: "rgba(10, 84, 150, 0.9)",
+                  color: "#fff",
+                  padding: "10px 14px",
+                  borderRadius: "14px",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  maxWidth: "min(520px, calc(100vw - 32px))",
+                  textAlign: "center",
+                  boxShadow: "0 10px 28px rgba(0,0,0,0.24)",
+                  backdropFilter: "blur(10px)",
+                  pointerEvents: "none",
+                  zIndex: 10000,
+                }}
+              >
+                {manualConfirmMessage}
+              </div>
+            )}
           </div>
-        )}
 
-        {showWalkthroughDebug && (
-          <div
-            className="walkthrough-debug-pill"
-            style={{
-              position: "fixed",
-              top: "12px",
-              left: "12px",
-              background: "rgba(18, 18, 22, 0.72)",
-              color: "rgba(255, 255, 255, 0.92)",
-              padding: "5px 8px",
-              borderRadius: "999px",
-              fontSize: "11px",
-              fontWeight: 700,
-              lineHeight: 1,
-              letterSpacing: 0,
-              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.18)",
-              backdropFilter: "blur(10px)",
-              pointerEvents: "none",
-              zIndex: 10001,
-            }}
-          >
-            {`STEP ${(currentStep.index ?? 0) + 1}/${currentStep.total ?? "?"}  X ${formatCoordinate(currentStep.x)}  Y ${formatCoordinate(currentStep.y)}`}
-          </div>
-        )}
-
-        {import.meta.env.DEV && isReplayRunning && currentStep && (
-          <div
-            style={{
-              position: "fixed",
-              top: "12px",
-              right: "12px",
-              background: "rgba(18, 18, 22, 0.72)",
-              color: "rgba(255, 255, 255, 0.92)",
-              padding: "5px 8px",
-              borderRadius: "999px",
-              fontSize: "11px",
-              fontWeight: 700,
-              lineHeight: 1,
-              letterSpacing: 0,
-              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.18)",
-              backdropFilter: "blur(10px)",
-              pointerEvents: "none",
-              zIndex: 10001,
-            }}
-          >
-            {`click-through: ${isClickThrough ? "ON" : "OFF"} | step ${(currentStep.index ?? 0) + 1}/${currentStep.total ?? "?"} | target X ${formatCoordinate(currentStep.x)} Y ${formatCoordinate(currentStep.y)} | waiting: ${manualConfirmMessage ? "fallback" : currentStep.ghostLocked ? "click" : "approach"}`}
-          </div>
-        )}
-
-        {isLoading && !demoPresentationMode && (
-          <div
-            style={{
-              position: "fixed",
-              bottom: "24px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "rgba(0, 0, 0, 0.75)",
-              color: "#fff",
-              padding: "10px 20px",
-              borderRadius: "20px",
-              fontSize: "14px",
-              fontWeight: 500,
-              backdropFilter: "blur(8px)",
-              pointerEvents: "none",
-              zIndex: 9999,
-            }}
-          >
-            {loadingMessage}
-          </div>
-        )}
-
-        {errorMessage && (
-          <div
-            style={{
-              position: "fixed",
-              top: "24px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "rgba(180, 32, 42, 0.88)",
-              color: "#fff",
-              padding: "10px 16px",
-              borderRadius: "16px",
-              fontSize: "13px",
-              fontWeight: 600,
-              maxWidth: "min(620px, calc(100vw - 32px))",
-              textAlign: "center",
-              backdropFilter: "blur(10px)",
-              pointerEvents: "none",
-              zIndex: 10000,
-            }}
-          >
-            {errorMessage}
-          </div>
-        )}
-
-        {agentStatusMessage && !errorMessage && (
-          <div
-            style={{
-              position: "fixed",
-              top: "24px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "rgba(22, 126, 78, 0.9)",
-              color: "#fff",
-              padding: "10px 16px",
-              borderRadius: "16px",
-              fontSize: "13px",
-              fontWeight: 650,
-              maxWidth: "min(760px, calc(100vw - 32px))",
-              textAlign: "center",
-              overflowWrap: "anywhere",
-              backdropFilter: "blur(10px)",
-              pointerEvents: "none",
-              zIndex: 10000,
-            }}
-          >
-            {agentStatusMessage}
-          </div>
-        )}
-
-        {isReplayRunning && (
-          <div
-            style={{
-              position: "fixed",
-              bottom: "24px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "rgba(20, 20, 24, 0.76)",
-              color: "#fff",
-              padding: "9px 14px",
-              borderRadius: "16px",
-              fontSize: "13px",
-              fontWeight: 600,
-              maxWidth: "min(520px, calc(100vw - 32px))",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.22)",
-              backdropFilter: "blur(10px)",
-              pointerEvents: "none",
-              zIndex: 9999,
-            }}
-          >
-            {statusText}
-          </div>
-        )}
-
-        {manualConfirmMessage && (
-          <div
-            style={{
-              position: "fixed",
-              bottom: "72px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "rgba(10, 84, 150, 0.9)",
-              color: "#fff",
-              padding: "10px 14px",
-              borderRadius: "14px",
-              fontSize: "13px",
-              fontWeight: 700,
-              maxWidth: "min(520px, calc(100vw - 32px))",
-              textAlign: "center",
-              boxShadow: "0 10px 28px rgba(0,0,0,0.24)",
-              backdropFilter: "blur(10px)",
-              pointerEvents: "none",
-              zIndex: 10000,
-            }}
-          >
-            {manualConfirmMessage}
-          </div>
-        )}
-
-        {isVisible && !isReplayRunning && showHudShell && (
-          <>
-            <div
-              ref={hudRef}
-              className={`specter-hud-shell ${isHudDragging ? "is-dragging" : ""}`}
+          {showProgressRail && (
+            <ProgressTracker
+              hudRef={hudRef}
+              expanded={railExpanded}
+              onToggleExpand={() => setRailExpanded((v) => !v)}
+              steps={stepHistory}
+              total={activeStepTotal}
+              currentIndex={activeStepIndex}
+              stepProgress={stepProgress}
+              isActive={isWalkthroughActive}
+              isComplete={sessionComplete || hasCompletedWalkthrough}
+              currentInstruction={statusText}
+              replayMode={replayMode}
+              onReplay={() => replaySavedWorkflow("walkthrough")}
               onMouseEnter={() => {
                 if (import.meta.env.VITE_DEBUG_VERBOSE === "true")
                   console.log("[OVERLAY_INTERACTION] mouse entered Specter UI");
@@ -3158,19 +3114,15 @@ const OverlayApp: React.FC = () => {
                 isHudHoveredRef.current = false;
                 setInteractivity(false);
               }}
-              style={hudStyle}
+              agentActions={agentActions}
             >
-              <div
-                className="specter-hud-drag-handle"
-                aria-label="Move Specter HUD"
-                title="Move Specter HUD"
-                onPointerDown={startHudDrag}
-                onPointerMove={moveHudDrag}
-                onPointerUp={stopHudDrag}
-                onPointerCancel={stopHudDrag}
-              >
-                <span />
-              </div>
+              <section className="specter-rail-status">
+                <div className="specter-rail-greeting">
+                  {intent ? "Working on your goal" : "How can I help?"}
+                </div>
+                {intent && <div className="specter-rail-intent">{intent}</div>}
+              </section>
+
               {showWorkflowCard && (
                 <div
                   className={workflowCardClassName}
@@ -3293,18 +3245,17 @@ const OverlayApp: React.FC = () => {
                       </div>
                     )}
 
-                  <div className="specter-action-row">
+                  <div className="specter-action-row openui-action-row">
                     {showFallbackWorkflow ? (
                       <>
-                        <button
-                          className="specter-action-button blue is-manual-primary"
+                        <SpecterWorkflowButton
+                          primary
                           disabled={isLoading}
                           onClick={startManualTargetPicking}
                         >
                           Pick manually
-                        </button>
-                        <button
-                          className="specter-action-button"
+                        </SpecterWorkflowButton>
+                        <SpecterWorkflowButton
                           disabled={isLoading}
                           onClick={() => {
                             setRealAppTargets(null);
@@ -3316,33 +3267,30 @@ const OverlayApp: React.FC = () => {
                           }}
                         >
                           Retry AI
-                        </button>
-                        <button
-                          className="specter-action-button"
+                        </SpecterWorkflowButton>
+                        <SpecterWorkflowButton
                           disabled={isLoading}
                           onClick={startNewChat}
                         >
                           New prompt
-                        </button>
-                        <button
-                          className="specter-action-button"
+                        </SpecterWorkflowButton>
+                        <SpecterWorkflowButton
                           disabled={isLoading}
                           onClick={prepareControlledDemo}
                         >
                           Practice Mode
-                        </button>
+                        </SpecterWorkflowButton>
                       </>
                     ) : (
                       <>
-                        <button
-                          className="specter-action-button blue is-manual-primary"
+                        <SpecterWorkflowButton
+                          primary
                           disabled={isLoading}
                           onClick={startManualTargetPicking}
                         >
                           Pick manually
-                        </button>
-                        <button
-                          className="specter-action-button"
+                        </SpecterWorkflowButton>
+                        <SpecterWorkflowButton
                           disabled={isLoading}
                           onClick={() => {
                             setRealAppTargets(null);
@@ -3357,30 +3305,28 @@ const OverlayApp: React.FC = () => {
                           }}
                         >
                           Retry
-                        </button>
-                        <button
-                          className="specter-action-button"
+                        </SpecterWorkflowButton>
+                        <SpecterWorkflowButton
                           disabled={isLoading}
                           onClick={startNewChat}
                         >
                           New prompt
-                        </button>
+                        </SpecterWorkflowButton>
                         {showDebugTools && (
-                          <button
-                            className="specter-action-button"
+                          <SpecterWorkflowButton
                             disabled={isLoading}
                             onClick={prepareControlledDemo}
                           >
                             Practice Mode
-                          </button>
+                          </SpecterWorkflowButton>
                         )}
-                        <button
-                          className="specter-action-button primary"
+                        <SpecterWorkflowButton
+                          primary
                           disabled={isLoading || !selectedRealAppTarget}
                           onClick={startRealAppWalkthrough}
                         >
                           Start ghost
-                        </button>
+                        </SpecterWorkflowButton>
                       </>
                     )}
                   </div>
@@ -3427,96 +3373,9 @@ const OverlayApp: React.FC = () => {
                 </div>
               )}
 
-              {!showWorkflowCard && !demoPresentationMode && (
-                <div
-                  onMouseEnter={() => setInteractivity(true)}
-                  onMouseLeave={() => setInteractivity(false)}
-                  style={{ width: "100%", position: "relative" }}
-                >
-                  <ChatThread
-                    messages={ultraSessionHistory}
-                    state={ultraState}
-                    mode={mode}
-                    voiceFallback={lastTTSProvider === "macos"}
-                  />
-                  <InputBar
-                    onSubmit={handleInputSubmit}
-                    onNewChat={startNewChat}
-                    disabled={isLoading}
-                    mode={mode}
-                    onUltraSpokenInput={handleUltraSpokenInput}
-                    onRecordingStart={cancelGhostListen}
-                    onTranscriptionStart={() => {
-                      if (mode === "ultra") setUltraState("transcribing");
-                    }}
-                    onTranscriptionEnd={() => {
-                      if (mode === "ultra")
-                        setUltraState((s) =>
-                          s === "transcribing" ? "waitingForUser" : s,
-                        );
-                    }}
-                    onFocus={() => {
-                      if (import.meta.env.VITE_DEBUG_VERBOSE === "true")
-                        console.log("[OVERLAY_INTERACTION] input focused");
-                      setIsInputFocused(true);
-                    }}
-                    onBlur={() => {
-                      if (import.meta.env.VITE_DEBUG_VERBOSE === "true")
-                        console.log("[OVERLAY_INTERACTION] input blurred");
-                      setIsInputFocused(false);
-                    }}
-                    onRecordingOverlayMouseEnter={() => setInteractivity(true)}
-                    onRecordingOverlayMouseLeave={() => setInteractivity(false)}
-                  />
-                  {!intent && screenState?.app && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "-24px",
-                        left: "20px",
-                        fontSize: "11px",
-                        fontWeight: 600,
-                        color: "rgba(255,255,255,0.42)",
-                        letterSpacing: "0.2px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                      <span>
-                        Looking at {screenState.app}
-                        {screenState.searchHint
-                          ? ` · "${screenState.searchHint}"`
-                          : screenState.recentTypedText
-                            ? ` · typing "${screenState.recentTypedText}"`
-                            : screenState.windowTitle
-                              ? ` · ${screenState.windowTitle}`
-                              : ""}
-                      </span>
-                      {mode === "ultra" && (
-                        <span
-                          style={{
-                            color:
-                              ultraState === "thinking" ||
-                              ultraState === "speaking" ||
-                              ultraState === "transcribing"
-                                ? "#30d158"
-                                : "rgba(255,255,255,0.25)",
-                            fontSize: "9px",
-                            textTransform: "uppercase",
-                            letterSpacing: "1px",
-                            fontWeight: 800,
-                          }}
-                        >
-                          {ultraState === "waitingForUser"
-                            ? "Ready"
-                            : ultraState}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Voice-only: Specter is purely conversational. The mic dock
+                  at the bottom of the screen is the single input surface —
+                  no chat thread, no text field. */}
 
               {showDebugTools && (
                 <div
@@ -4084,23 +3943,6 @@ const OverlayApp: React.FC = () => {
                     >
                       Move center
                     </button>
-                    <button
-                      onClick={resetHudPosition}
-                      style={{
-                        flex: 1,
-                        minWidth: "110px",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                        borderRadius: "10px",
-                        padding: "8px",
-                        color: "white",
-                        background: "rgba(255,255,255,0.08)",
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Reset HUD
-                    </button>
                   </div>
                   {calibrationMessage && (
                     <div
@@ -4135,74 +3977,36 @@ const OverlayApp: React.FC = () => {
                   nodeId={lastNodeId}
                   appName={screenState?.app}
                   isBusy={isLoading}
-                  isWalkthroughActive={false}
-                  stepProgress={
-                    currentStep
-                      ? (currentStep.index ?? 0) /
-                        Math.max(1, currentStep.total ?? 1)
-                      : 0
-                  }
+                  isWalkthroughActive={isWalkthroughActive}
+                  stepProgress={stepProgress}
                   onWalkthrough={() => replaySavedWorkflow("walkthrough")}
                   onAutoExecute={() => replaySavedWorkflow("auto")}
                 />
               )}
-            </div>
-          </>
-        )}
-
-        {isVisible &&
-          !isReplayRunning &&
-          demoPresentationMode &&
-          !showWorkflowCard && (
-            <>
-              {/* Demo conversation dock: shows the ghost's replies as text and
-                  accepts typed questions, so the conversation is visible both
-                  ways even in voice-first demo mode. */}
-              <div
-                className="demo-chat-dock"
-                onMouseEnter={() => setInteractivity(true)}
-                onMouseLeave={() => setInteractivity(false)}
-              >
-                <ChatThread
-                  messages={ultraSessionHistory}
-                  state={ultraState}
-                  mode={mode}
-                  voiceFallback={lastTTSProvider === "macos"}
-                />
-                <InputBar
-                  onSubmit={handleInputSubmit}
-                  onNewChat={startNewChat}
-                  disabled={isLoading}
-                  mode={mode}
-                  onUltraSpokenInput={handleUltraSpokenInput}
-                  onRecordingStart={cancelGhostListen}
-                  onTranscriptionStart={() => setUltraState("transcribing")}
-                  onTranscriptionEnd={() => {
-                    setUltraState((s) =>
-                      s === "transcribing" ? "waitingForUser" : s,
-                    );
-                  }}
-                  onFocus={() => setIsInputFocused(true)}
-                  onBlur={() => setIsInputFocused(false)}
-                  onRecordingOverlayMouseEnter={() => setInteractivity(true)}
-                  onRecordingOverlayMouseLeave={() => setInteractivity(false)}
-                />
-              </div>
-              <VoiceMicButton
-                disabled={isLoading}
-                onSpokenInput={handleUltraSpokenInput}
-                onRecordingStart={cancelGhostListen}
-                onTranscriptionStart={() => setUltraState("transcribing")}
-                onTranscriptionEnd={() => {
-                  setUltraState((s) =>
-                    s === "transcribing" ? "waitingForUser" : s,
-                  );
-                }}
-                onMouseEnter={() => setInteractivity(true)}
-                onMouseLeave={() => setInteractivity(false)}
-              />
-            </>
+            </ProgressTracker>
           )}
+        </div>
+
+        {isVisible && !isReplayRunning && !showWorkflowCard && (
+          /* Purely conversational: a single mic is the only input surface.
+             State (listening / thinking / speaking) shows as a small status
+             pill under the mic — no chat thread, no text box. */
+          <VoiceMicButton
+            disabled={isLoading}
+            conversationState={ultraState}
+            voiceFallback={lastTTSProvider === "macos"}
+            onSpokenInput={handleUltraSpokenInput}
+            onRecordingStart={cancelGhostListen}
+            onTranscriptionStart={() => setUltraState("transcribing")}
+            onTranscriptionEnd={() => {
+              setUltraState((s) =>
+                s === "transcribing" ? "waitingForUser" : s,
+              );
+            }}
+            onMouseEnter={() => setInteractivity(true)}
+            onMouseLeave={() => setInteractivity(false)}
+          />
+        )}
       </div>
     </>
   );

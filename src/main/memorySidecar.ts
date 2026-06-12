@@ -1,8 +1,30 @@
 import { spawn } from "child_process";
+import { existsSync } from "fs";
 import { join } from "path";
 import { safeLog, safeError } from "./logger";
 
-const DEFAULT_WIKI_ROOT = "./demo-workflows/event-recap/wiki";
+export const DEFAULT_WIKI_ROOT = "./demo-workflows/event-recap/wiki";
+
+export function memoryServicePort(): string {
+  return process.env.MEMORY_SERVICE_PORT || "8765";
+}
+
+export async function postToMemoryService<T extends Record<string, unknown>>(
+  path: string,
+  body?: Record<string, unknown>,
+): Promise<T> {
+  const port = memoryServicePort();
+  const res = await fetch(`http://127.0.0.1:${port}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body ?? {}),
+  });
+  if (!res.ok) {
+    const detail = (await res.text()).slice(0, 300);
+    throw new Error(`Memory service ${path} failed: HTTP ${res.status} ${detail}`);
+  }
+  return (await res.json()) as T;
+}
 
 async function isSidecarHealthy(port: string): Promise<boolean> {
   try {
@@ -35,9 +57,12 @@ export async function startMemorySidecar() {
     }
     safeLog("[GhostWiki] Sidecar died during reuse check, spawning fresh");
   }
+  const venvPython = join(process.cwd(), "memory_service", ".venv", "bin", "python");
   const pythonExec = process.env.VIRTUAL_ENV
     ? join(process.env.VIRTUAL_ENV, "bin", "python")
-    : "python";
+    : existsSync(venvPython)
+      ? venvPython
+      : "python3";
 
   safeLog("[GhostWiki] Starting memory sidecar on port", {
     port,
@@ -78,5 +103,21 @@ export async function startMemorySidecar() {
     safeLog(`[MemoryService] Exited with code ${code}`);
   });
 
+  await waitForSidecarReady(port);
   return child;
+}
+
+export async function waitForSidecarReady(
+  port = process.env.MEMORY_SERVICE_PORT || "8765",
+  maxAttempts = 15,
+): Promise<boolean> {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (await isSidecarHealthy(port)) {
+      safeLog("[GhostWiki] Memory sidecar ready", { port, attempt: attempt + 1 });
+      return true;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+  safeError("[GhostWiki] Memory sidecar failed readiness check", { port });
+  return false;
 }

@@ -8,30 +8,71 @@ export COGNEE_ENABLED=false
 export GHOSTWIKI_WIKI_ROOT=./demo-workflows/event-recap/wiki
 export MEMORY_SERVICE_PORT=8765
 
-echo "Starting memory service in background..."
-python -m uvicorn memory_service.app:app --port $MEMORY_SERVICE_PORT &
-MEMORY_SERVICE_PID=$!
+MEMORY_SERVICE_PID=""
+STARTED_BY_SCRIPT=0
+
+function verify_sidecar_config() {
+  for attempt in 1 2 3 4 5; do
+    if python -c "
+import json, os, sys, urllib.request
+port = os.environ['MEMORY_SERVICE_PORT']
+expected_root = os.environ['GHOSTWIKI_WIKI_ROOT']
+with urllib.request.urlopen(f'http://127.0.0.1:{port}/health', timeout=3) as r:
+    data = json.load(r)
+if data.get('status') != 'ok':
+    sys.exit(1)
+if data.get('wiki_root') != expected_root:
+    sys.exit(1)
+if data.get('cognee_enabled') is not False:
+    sys.exit(1)
+"; then
+      echo "PASS: sidecar config verified"
+      return 0
+    fi
+    sleep 0.4
+  done
+  return 1
+}
 
 function cleanup {
   rm -f "$CORRECTION_FILE"
-  echo "Cleaning up memory service (PID: $MEMORY_SERVICE_PID)..."
-  kill $MEMORY_SERVICE_PID || true
+  if [ "$STARTED_BY_SCRIPT" = "1" ] && [ -n "$MEMORY_SERVICE_PID" ]; then
+    echo "Cleaning up memory service (PID: $MEMORY_SERVICE_PID)..."
+    kill $MEMORY_SERVICE_PID || true
+  fi
 }
 trap cleanup EXIT
 
-echo "Waiting for service to be healthy..."
-for i in {1..10}; do
-  if curl -s http://127.0.0.1:$MEMORY_SERVICE_PORT/health >/dev/null; then
-    break
-  fi
-  sleep 1
-done
+REUSE_EXISTING=0
+if verify_sidecar_config; then
+  echo "Reusing existing memory service on port $MEMORY_SERVICE_PORT"
+  REUSE_EXISTING=1
+fi
 
-HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$MEMORY_SERVICE_PORT/health)
-if [ "$HEALTH_STATUS" != "200" ]; then
-    echo "FAIL: Health check failed with status $HEALTH_STATUS"
-    cleanup
+if [ "$REUSE_EXISTING" = "0" ]; then
+  echo "Starting memory service in background..."
+  COGNEE_ENABLED=false GHOSTWIKI_WIKI_ROOT="$GHOSTWIKI_WIKI_ROOT" \
+    python -m uvicorn memory_service.app:app --host 127.0.0.1 --port "$MEMORY_SERVICE_PORT" &
+  MEMORY_SERVICE_PID=$!
+  STARTED_BY_SCRIPT=1
+
+  echo "Waiting for service to be healthy..."
+  for i in {1..15}; do
+    if curl -s "http://127.0.0.1:$MEMORY_SERVICE_PORT/health" >/dev/null 2>&1; then
+      break
+    fi
+    sleep 0.5
+  done
+
+  HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:$MEMORY_SERVICE_PORT/health")
+  if [ "$HEALTH_STATUS" != "200" ]; then
+      echo "FAIL: Health check failed with status $HEALTH_STATUS"
+      exit 1
+  fi
+  verify_sidecar_config || {
+    echo "FAIL: started sidecar but config verification failed"
     exit 1
+  }
 fi
 echo "PASS: Health check"
 

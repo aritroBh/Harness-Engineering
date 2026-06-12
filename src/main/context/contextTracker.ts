@@ -63,7 +63,7 @@ const BROWSER_BUNDLES = new Set([
 
 let fallbackPollTimer: NodeJS.Timeout | null = null;
 let pollInflight = false;
-let pollCount = 0;
+let snapshotPersistCount = 0;
 let history: ContextSnapshot[] = [];
 let latestSnapshot: ContextSnapshot | null = null;
 let lastVoiceTranscript: string | null = null;
@@ -194,6 +194,24 @@ function recordAppSwitch(
   }
 }
 
+function commitSnapshot(
+  snapshot: ContextSnapshot,
+  logLabel: string,
+  fields: Record<string, unknown>,
+): void {
+  latestSnapshot = snapshot;
+  history = [...history, snapshot].slice(-HISTORY_MAX);
+  snapshotPersistCount += 1;
+  if (snapshotPersistCount % 3 === 0) {
+    persistContextSnapshot(snapshot);
+    safeLog("[CONTEXT] persisted to disk", {
+      snapshotPersistCount,
+      appName: snapshot.appName,
+    });
+  }
+  safeLog(logLabel, fields);
+}
+
 async function buildSnapshotFromTree(
   tree: SerializedTree,
   reason: string,
@@ -239,14 +257,7 @@ async function buildSnapshotFromTree(
     typingBurstCount: getTypingBurstCount(60_000),
   };
 
-  latestSnapshot = snapshot;
-  history = [...history, snapshot].slice(-HISTORY_MAX);
-
-  if (pollCount % 3 === 0) {
-    persistContextSnapshot(snapshot);
-  }
-
-  safeLog("[CONTEXT] snapshot", {
+  commitSnapshot(snapshot, "[CONTEXT] snapshot", {
     reason,
     appName,
     windowTitle: windowTitle?.slice(0, 80) || null,
@@ -265,7 +276,6 @@ async function pollContextFallback(
     return latestSnapshot || emptySnapshot();
   }
   pollInflight = true;
-  pollCount += 1;
 
   try {
     const frontmost = await getFrontmostApp();
@@ -323,14 +333,7 @@ async function pollContextFallback(
       typingBurstCount: getTypingBurstCount(60_000),
     };
 
-    latestSnapshot = snapshot;
-    history = [...history, snapshot].slice(-HISTORY_MAX);
-
-    if (pollCount % 3 === 0) {
-      persistContextSnapshot(snapshot);
-    }
-
-    safeLog("[CONTEXT] fallback snapshot", {
+    commitSnapshot(snapshot, "[CONTEXT] fallback snapshot", {
       reason,
       appName,
       windowTitle: windowTitle?.slice(0, 80) || null,

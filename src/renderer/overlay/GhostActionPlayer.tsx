@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { MessageLoading } from "@openuidev/react-ui";
 import { useGhostTravel } from "./useGhostTravel";
+import { GhostCursorIcon } from "./GhostCursorIcon";
 import {
   clampPercent,
   cursorTransform,
@@ -12,19 +14,6 @@ export interface GhostActionPlayerProps {
   /** Viewport-percent origin for first travel (e.g. idle roam position). */
   start?: { x: number; y: number };
 }
-
-const GhostCursorSvg: React.FC<{ className?: string }> = ({ className }) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" className={className}>
-    <path
-      d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L5.5 3.21z"
-      fill="white"
-      stroke="black"
-      strokeWidth="1"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    />
-  </svg>
-);
 
 export const GhostActionPlayer: React.FC<GhostActionPlayerProps> = ({
   step,
@@ -84,32 +73,25 @@ export const GhostActionPlayer: React.FC<GhostActionPlayerProps> = ({
   const trailOffsetX = (-travelDx / travelLen) * 6;
   const trailOffsetY = (-travelDy / travelLen) * 6;
 
-  const baseStyle: React.CSSProperties = {
-    position: "fixed",
-    left: 0,
-    top: 0,
+  const hostStyle: React.CSSProperties = {
     transform: cursorTransform(px, py, dims),
-    pointerEvents: "none",
-    zIndex: 9999,
-    willChange: "transform",
     transition: isTraveling ? "transform 550ms ease-out" : "none",
-    filter: "drop-shadow(0 3px 5px rgba(0, 0, 0, 0.38))",
   };
 
   if (isTraveling) {
     return (
       <>
         <div
-          className="ghost-travel-trail"
+          className="openui-ghost-cursor-host openui-ghost-cursor-host--trail"
           style={{
-            ...baseStyle,
+            ...hostStyle,
             transform: cursorTransform(px, py, dims, trailOffsetX, trailOffsetY),
           }}
         >
-          <GhostCursorSvg />
+          <GhostCursorIcon />
         </div>
-        <div style={baseStyle}>
-          <GhostCursorSvg />
+        <div className="openui-ghost-cursor-host" style={hostStyle}>
+          <GhostCursorIcon />
         </div>
       </>
     );
@@ -117,17 +99,17 @@ export const GhostActionPlayer: React.FC<GhostActionPlayerProps> = ({
 
   if (!isArrived) {
     return (
-      <div style={baseStyle}>
-        <GhostCursorSvg />
+      <div className="openui-ghost-cursor-host" style={hostStyle}>
+        <GhostCursorIcon />
       </div>
     );
   }
 
   if (action === "click") {
     return (
-      <div style={baseStyle}>
+      <div className="openui-ghost-cursor-host" style={hostStyle}>
         <div className="ghost-action-click">
-          <GhostCursorSvg />
+          <GhostCursorIcon expression="excited" />
         </div>
       </div>
     );
@@ -136,25 +118,15 @@ export const GhostActionPlayer: React.FC<GhostActionPlayerProps> = ({
   if (action === "type") {
     const caption = step.typeText ? String(step.typeText).slice(0, 24) : null;
     return (
-      <div style={baseStyle}>
-        <div style={{ display: "flex", alignItems: "flex-start" }}>
-          <GhostCursorSvg />
+      <div className="openui-ghost-cursor-host" style={hostStyle}>
+        <div className="openui-ghost-type-row">
+          <GhostCursorIcon />
           <div className="ghost-action-type" />
         </div>
         {caption && (
-          <div
-            style={{
-              marginTop: 4,
-              marginLeft: 2,
-              fontSize: 10,
-              fontWeight: 600,
-              color: "rgba(255,255,255,0.9)",
-              textShadow: "0 1px 3px rgba(0,0,0,0.5)",
-              whiteSpace: "nowrap",
-            }}
-          >
+          <div className="openui-ghost-type-caption">
             {caption}
-            <span style={{ opacity: 0.7 }}>{typingDots}</span>
+            <span>{typingDots}</span>
           </div>
         )}
       </div>
@@ -163,18 +135,19 @@ export const GhostActionPlayer: React.FC<GhostActionPlayerProps> = ({
 
   if (action === "scroll") {
     return (
-      <div style={baseStyle}>
+      <div className="openui-ghost-cursor-host" style={hostStyle}>
         <div className="ghost-action-scroll">
-          <GhostCursorSvg />
+          <GhostCursorIcon />
         </div>
       </div>
     );
   }
 
   return (
-    <div style={baseStyle}>
-      <div className="ghost-action-wait">
-        <GhostCursorSvg />
+    <div className="openui-ghost-cursor-host" style={hostStyle}>
+      <div className="ghost-action-wait openui-ghost-wait">
+        <GhostCursorIcon expression="thinking" />
+        <MessageLoading />
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import React from "react";
+import { Callout } from "@openuidev/react-ui";
 
 export interface ReasoningLine {
   text: string;
@@ -17,15 +18,13 @@ export const ReasoningBubbles: React.FC<ReasoningBubblesProps> = ({
   return (
     <div className="reasoning-bubbles" aria-live="polite" aria-atomic="false">
       {lines.map((line, index) => (
-        <div
+        <Callout
           key={`${index}-${line.text}`}
-          className={`reasoning-bubble ${line.active ? "is-active" : "is-done"}`}
-        >
-          {line.active && (
-            <span className="reasoning-bubble__dot" aria-hidden />
-          )}
-          <span>{line.text}</span>
-        </div>
+          variant={line.active ? "info" : "neutral"}
+          title={line.active ? "Thinking" : "Observed"}
+          description={line.text}
+          className={`reasoning-bubble-callout ${line.active ? "is-active" : "is-done"}`}
+        />
       ))}
     </div>
   );

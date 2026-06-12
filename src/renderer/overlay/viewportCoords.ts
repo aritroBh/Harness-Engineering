@@ -1,6 +1,7 @@
 /** Viewport-percent (0–100) → overlay pixel coords. Single source of truth. */
 
-export const CURSOR_HOTSPOT = { x: 5.5, y: 3.21 };
+/** Bottom-center of cute ghost tail lands on target. */
+export const CURSOR_HOTSPOT = { x: 18, y: 35 };
 
 export function clampPercent(value: number): number {
   if (!Number.isFinite(value)) return 0;

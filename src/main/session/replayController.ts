@@ -79,10 +79,52 @@ export function sendOverlay(channel: string, payload: any): void {
   contents.send(channel, payload);
 }
 
+export type AgentActionStatus = "running" | "done" | "info" | "warn";
+
+export interface AgentActionEvent {
+  id: string;
+  ts: number;
+  /** Short human line, e.g. `Clicking "Create Event"`. */
+  label: string;
+  /** Optional secondary detail, e.g. `re-grounded on live screen (92%)`. */
+  detail?: string;
+  status: AgentActionStatus;
+  stepIndex?: number;
+}
+
+let agentActionSeq = 0;
+
+/**
+ * Push a live "what the agent is doing right now" entry to the overlay's
+ * right rail. Fire-and-forget; rendering happens in ProgressTracker.
+ */
+export function emitAgentAction(
+  label: string,
+  options: {
+    detail?: string;
+    status?: AgentActionStatus;
+    stepIndex?: number;
+  } = {},
+): void {
+  agentActionSeq += 1;
+  const event: AgentActionEvent = {
+    id: `action-${Date.now()}-${agentActionSeq}`,
+    ts: Date.now(),
+    label,
+    detail: options.detail,
+    status: options.status ?? "info",
+    stepIndex: options.stepIndex,
+  };
+  sendOverlay("replay:action", event);
+}
+
 export function setOverlayForReplay(): void {
   const overlayWindow = getOverlayWindow();
   if (!overlayWindow || overlayWindow.isDestroyed()) return;
-  if (!overlayWindow.isVisible()) overlayWindow.show();
+  if (!overlayWindow.isVisible()) {
+    overlayWindow.show();
+    sendOverlay("overlay:visibility", { visible: true });
+  }
   if (process.env.DEBUG_VERBOSE === "true") {
     safeLog("[OVERLAY_INTERACTION] replay starting, enabled click-through");
   }
@@ -92,7 +134,10 @@ export function setOverlayForReplay(): void {
 export function setOverlayForKeyboardFallback(): void {
   const overlayWindow = getOverlayWindow();
   if (!overlayWindow || overlayWindow.isDestroyed()) return;
-  if (!overlayWindow.isVisible()) overlayWindow.show();
+  if (!overlayWindow.isVisible()) {
+    overlayWindow.show();
+    sendOverlay("overlay:visibility", { visible: true });
+  }
   if (process.env.DEBUG_VERBOSE === "true") {
     safeLog(
       "[OVERLAY_INTERACTION] keyboard fallback, disabled click-through (interactive mode)",
@@ -122,6 +167,7 @@ export function restoreOverlayAfterReplay(controller: ReplayController): void {
   }
   overlayWindow.setIgnoreMouseEvents(true, { forward: true });
   overlayWindow.hide();
+  sendOverlay("overlay:visibility", { visible: false });
 }
 
 export function stopReplay(): void {

@@ -283,13 +283,72 @@ async function main() {
     !ghostCursor.includes("targetX") && !ghostCursor.includes("targetY"),
     "GhostCursor does not use targetX/targetY",
   );
+  const ghostCursorIcon = readFile("src/renderer/overlay/GhostCursorIcon.tsx");
+  const cuteGhostSvg = readFile("src/renderer/overlay/CuteGhostSvg.tsx");
   check(
-    ghostCursor.includes('fill="white"'),
-    "GhostCursor renders a white pointer shape",
+    ghostCursor.includes("GhostCursorIcon") &&
+      ghostCursorIcon.includes("CuteGhostSvg") &&
+      cuteGhostSvg.includes("--openui-text-white"),
+    "GhostCursor uses cute OpenUI-tokenized ghost mascot",
   );
   check(
-    !ghostCursor.includes("cursor-dot") && !ghostCursor.includes("#7c3aed"),
-    "GhostCursor is not a pointer dot/orb",
+    !ghostCursor.includes("cursor-dot") &&
+      !ghostCursor.includes("#7c3aed") &&
+      !cuteGhostSvg.includes("M5.5 3.21"),
+    "GhostCursor is a cute ghost, not pointer dot/orb/arrow",
+  );
+  check(
+    readFile("src/renderer/overlay/ProgressTracker.tsx").includes(
+      "specter-rail-steps-list--full",
+    ) &&
+      readFile("src/renderer/overlay/stepHistory.ts").includes("sessionComplete"),
+    "ProgressTracker shows full step list with persistent session state",
+  );
+  check(
+    overlayCss.includes(".specter-rail-collapsed-bar"),
+    "collapsed progress rail shows vertical progress indicator",
+  );
+  check(
+    readFile("src/renderer/src/OverlayApp.tsx").includes("ProgressTracker") &&
+      readFile("src/renderer/src/OverlayApp.tsx").includes("sessionComplete"),
+    "OverlayApp wires ProgressTracker with persistent step session",
+  );
+
+  const pkgJson = JSON.parse(readFile("package.json"));
+  check(
+    Boolean(pkgJson.dependencies?.["@openuidev/react-ui"]),
+    "package.json depends on @openuidev/react-ui",
+  );
+  check(
+    overlayEntry.includes("@openuidev/react-ui/components.css") &&
+      overlayEntry.includes("SpecterOpenUIProvider"),
+    "overlay entry loads OpenUI CSS and ThemeProvider wrapper",
+  );
+  check(
+    readFile("src/renderer/overlay/InputBar.tsx").includes(
+      '@openuidev/react-ui',
+    ) &&
+      readFile("src/renderer/overlay/InputBar.tsx").includes("<Input") &&
+      readFile("src/renderer/overlay/InputBar.tsx").includes("<IconButton"),
+    "InputBar uses OpenUI Input and IconButton",
+  );
+  check(
+    readFile("src/renderer/overlay/ModeToggle.tsx").includes("<Buttons") &&
+      readFile("src/renderer/overlay/ModeToggle.tsx").includes("<Button"),
+    "ModeToggle uses OpenUI Buttons and Button",
+  );
+  check(
+    overlayAppBody.includes("SpecterWorkflowButton") &&
+      !overlayAppBody.includes('className="specter-action-button'),
+    "workflow actions use OpenUI SpecterWorkflowButton",
+  );
+  check(
+    (overlayCss.match(/--openui-/g) || []).length >= 40,
+    "overlay.css references 40+ OpenUI design tokens",
+  );
+  check(
+    Boolean(pkgJson.scripts?.["verify:openui"]),
+    "package.json exposes npm run verify:openui proof script",
   );
 
   printHeader("Renderer Stability");
@@ -468,11 +527,17 @@ async function main() {
     "Start ghost is disabled until a target is selected",
   );
   check(
-    overlayAppBody.includes("is-manual-primary") &&
+    (overlayAppBody.includes("SpecterWorkflowButton") &&
+      overlayAppBody.includes("primary") &&
       overlayAppBody.includes("startManualTargetPicking") &&
       overlayAppBody.includes(
         "Click the exact spot you want Specter to teach.",
-      ),
+      )) ||
+      (overlayAppBody.includes("is-manual-primary") &&
+        overlayAppBody.includes("startManualTargetPicking") &&
+        overlayAppBody.includes(
+          "Click the exact spot you want Specter to teach.",
+        )),
     "Pick manually is prominent and uses exact-spot instruction",
   );
   check(
@@ -1343,7 +1408,7 @@ async function main() {
 
   check(
     overlayAppBody.includes("speakIfUltra") &&
-      overlayAppBody.includes('mode === "ultra"'),
+      overlayAppBody.includes('currentMode === "ultra"'),
     "renderer gates speech on ultra mode",
   );
   check(
@@ -1381,9 +1446,14 @@ async function main() {
     "OverlayApp has handleUltraSpokenInput and ultraState",
   );
   check(
-    /ultraState === ['"]thinking['"]/.test(overlayAppBody) &&
-      /ultraState === ['"]speaking['"]/.test(overlayAppBody),
-    "OverlayApp shows ultra state visibility",
+    overlayAppBody.includes("conversationState={ultraState}") &&
+      /conversationState === ['"]thinking['"]/.test(
+        readFile("src/renderer/overlay/VoiceMicButton.tsx"),
+      ) &&
+      /conversationState === ['"]speaking['"]/.test(
+        readFile("src/renderer/overlay/VoiceMicButton.tsx"),
+      ),
+    "voice dock shows ultra state visibility (thinking/speaking pill)",
   );
   check(
     overlayAppBody.includes("setTimeout") &&
@@ -1467,8 +1537,8 @@ async function main() {
   );
   check(
     ghostActionPlayerBody.includes("useGhostTravel") &&
-      ghostActionPlayerBody.includes("ghost-travel-trail"),
-    "GhostActionPlayer uses travel animation hook and trail",
+      ghostActionPlayerBody.includes("openui-ghost-cursor-host--trail"),
+    "GhostActionPlayer uses travel animation hook and OpenUI trail styling",
   );
   check(
     useGhostTravelBody.includes('phase === "travel"') &&

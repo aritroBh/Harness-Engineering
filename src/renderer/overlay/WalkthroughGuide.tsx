@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Callout, Tag } from "@openuidev/react-ui";
+import { CuteGhostSvg } from "./CuteGhostSvg";
 import {
   clampPercent,
   centerTransform,
@@ -37,17 +39,36 @@ export const WalkthroughGuide: React.FC<WalkthroughGuideProps> = ({ step }) => {
       }}
     >
       <div className="walkthrough-guide-ring" />
-      <div className="walkthrough-guide-dot" />
+      <div className="walkthrough-guide-dot">
+        <CuteGhostSvg
+          size={18}
+          expression={isLocked ? "excited" : isWait ? "thinking" : "happy"}
+          className="walkthrough-guide-ghost"
+        />
+      </div>
 
       {hasHint && (
         <div
           className={[
-            "walkthrough-guide-bubble",
+            "walkthrough-guide-bubble-wrap",
             bubbleOnLeft ? "is-left" : "is-right",
             bubbleAbove ? "is-above" : "is-below",
           ].join(" ")}
         >
-          {step.instruction || step.targetLabel}
+          {isLocked && (
+            <Tag
+              className="walkthrough-guide-tag"
+              text="On target"
+              variant="success"
+              size="sm"
+            />
+          )}
+          <Callout
+            variant={isLocked ? "success" : isWait ? "warning" : "info"}
+            title={isLocked ? "Ready to click" : isWait ? "Waiting" : "Next step"}
+            description={step.instruction || step.targetLabel}
+            className="walkthrough-guide-callout"
+          />
         </div>
       )}
     </div>

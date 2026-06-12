@@ -60,6 +60,8 @@ const api = {
   setOverlayClickThrough: (clickThrough: boolean) =>
     ipcRenderer.invoke("overlay:setClickThrough", clickThrough),
   onOverlayToggle: (callback: () => void) => onIpc("overlay:toggle", callback),
+  onOverlayVisibility: (callback: (data: { visible: boolean }) => void) =>
+    onIpc("overlay:visibility", callback),
   onFocusInput: (callback: () => void) =>
     onIpc("overlay:focus-input", callback),
 
@@ -193,6 +195,8 @@ const api = {
     onIpc("replay:confirm-cleared", callback),
   onReplayProgress: (callback: (data: any) => void) =>
     onIpc("replay:progress", callback),
+  onReplayAction: (callback: (data: any) => void) =>
+    onIpc("replay:action", callback),
   onReplayComplete: (callback: () => void) =>
     onIpc("replay:complete", callback),
   onReplayStopped: (callback: () => void) => onIpc("replay:stopped", callback),
@@ -224,7 +228,6 @@ const api = {
   refreshContextSnapshot: () => ipcRenderer.invoke("context:refresh"),
   getProactivePrediction: () => ipcRenderer.invoke("proactive:predict"),
 
-
   // Part A — tutor session (one-step-at-a-time loop)
   startTutorSession: (goal: string, appHint?: string) =>
     ipcRenderer.invoke("session:start", { goal, appHint }),
@@ -232,7 +235,8 @@ const api = {
   getPermissionStatus: () => ipcRenderer.invoke("permissions:get"),
   getDebugTree: () => ipcRenderer.invoke("debug:tree"),
   getSkillProfile: (app: string) => ipcRenderer.invoke("profile:get", app),
-  seedDemoProfile: (app?: string) => ipcRenderer.invoke("profile:seed-demo", app),
+  seedDemoProfile: (app?: string) =>
+    ipcRenderer.invoke("profile:seed-demo", app),
   // thinking | step_advanced | step_corrected | goal_complete
   onSpecEvent: (callback: (event: any) => void) =>
     onIpc("spec:event", callback),

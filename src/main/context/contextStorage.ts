@@ -1,7 +1,7 @@
 import { app } from "electron";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
-import { safeWarn } from "../logger";
+import { safeLog, safeWarn } from "../logger";
 import type { ContextSnapshot } from "./contextTracker";
 
 interface StoredContextFile {
@@ -39,6 +39,10 @@ export function persistContextSnapshot(snapshot: ContextSnapshot): void {
       updatedAt: Date.now(),
     };
     writeFileSync(file, JSON.stringify(next, null, 2), "utf-8");
+    safeLog("[CONTEXT] wrote context-history.json", {
+      path: file,
+      snapshotCount: next.snapshots.length,
+    });
   } catch (error) {
     safeWarn("[CONTEXT] failed to persist snapshot", {
       error: error instanceof Error ? error.message : String(error),

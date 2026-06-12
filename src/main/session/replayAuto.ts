@@ -11,6 +11,7 @@ import type { Step } from "./types";
 import { resolveTarget } from "../automation/targetResolver";
 import {
   createReplayController,
+  emitAgentAction,
   isActive,
   releaseReplayController,
   restoreOverlayAfterReplay,
@@ -19,6 +20,8 @@ import {
   sleep,
 } from "./replayController";
 import { isProhibitedAutonomousLabel } from "../clinical/prohibitedActions";
+import { refreshStepTarget } from "./stepRefresher";
+import { toScreenPoint } from "../screenCoordinates";
 
 const DEFAULT_WAIT_STEP_MS = 800;
 
@@ -50,6 +53,22 @@ function stepTitle(step: Step): string {
   return step.instruction || step.targetLabel || step.id || "Untitled step";
 }
 
+function actionVerb(step: Step): string {
+  const label = step.targetLabel ? `"${step.targetLabel}"` : "target";
+  switch (step.action) {
+    case "click":
+      return `Clicking ${label}`;
+    case "type":
+      return `Typing ${step.typeText ? `"${String(step.typeText).slice(0, 40)}"` : "text"}${step.targetLabel ? ` into ${label}` : ""}`;
+    case "scroll":
+      return `Scrolling ${label}`;
+    case "wait":
+      return "Waiting for the screen to settle";
+    default:
+      return `Performing ${step.action} on ${label}`;
+  }
+}
+
 export async function replayAutoExecute(steps: Step[]): Promise<void> {
   const controller = createReplayController();
   setOverlayForReplay();
@@ -60,7 +79,17 @@ export async function replayAutoExecute(steps: Step[]): Promise<void> {
   try {
     for (let index = 0; index < steps.length; index++) {
       if (!isActive(controller)) break;
-      const step = steps[index];
+      // Re-ground the step against what is actually on screen *right now*
+      // (live AX tree of the real app). Each executed action mutates the UI,
+      // so a fresh dump per step — stored coordinates are only a fallback.
+      const step = await refreshStepTarget(steps[index], { forceFresh: true });
+      if (step.liveResolved) {
+        emitAgentAction(`Found "${step.liveMatchedLabel}" on screen`, {
+          detail: `match ${Math.round((step.liveConfidence ?? 0) * 100)}% · live coordinates`,
+          status: "info",
+          stepIndex: index,
+        });
+      }
       if (
         clinicalSafetyFilterEnabled() &&
         isProhibitedAutonomousLabel(clinicalSafetyHaystack(step))
@@ -78,8 +107,17 @@ export async function replayAutoExecute(steps: Step[]): Promise<void> {
           step,
           reason: "prohibited autonomous action",
         });
+        emitAgentAction(`Blocked: "${stepTitle(step)}" needs your confirmation`, {
+          detail: "safety filter — autonomous execution refused",
+          status: "warn",
+          stepIndex: index,
+        });
         break;
       }
+      emitAgentAction(actionVerb(step), {
+        status: "running",
+        stepIndex: index,
+      });
       safeLog("[AUTO_REAL_MOUSE] real mouse step", {
         index,
         displayIndex: index + 1,
@@ -120,6 +158,10 @@ export async function replayAutoExecute(steps: Step[]): Promise<void> {
             step,
             reason: "low confidence or unsafe target",
           });
+          emitAgentAction(`Paused: not confident about "${stepTitle(step)}"`, {
+            status: "warn",
+            stepIndex: index,
+          });
           break;
         }
 
@@ -147,7 +189,9 @@ export async function replayAutoExecute(steps: Step[]): Promise<void> {
               snapshotId: (step as any).snapshotId,
             };
           } else if (typeof step.x === "number" && typeof step.y === "number") {
-            pkTarget = { kind: "coords", x: step.x, y: step.y };
+            // Peekaboo expects physical pixels; step.x/y are display percent.
+            const px = await toScreenPoint(step.x, step.y);
+            pkTarget = { kind: "coords", x: px.x, y: px.y };
           } else if (
             resolved.bbox &&
             typeof resolved.bbox.x === "number" &&
@@ -197,6 +241,10 @@ export async function replayAutoExecute(steps: Step[]): Promise<void> {
               "[AUTO_REAL_MOUSE] Peekaboo click failed, attempting fallback",
               { result },
             );
+            emitAgentAction("Element click failed — using system mouse", {
+              status: "warn",
+              stepIndex: index,
+            });
             // Fallback AX -> vision -> real mouse
             const fallbackResolved = resolveTarget(step, {
               hasDOM: false,
@@ -304,6 +352,10 @@ export async function replayAutoExecute(steps: Step[]): Promise<void> {
       safeLog("[AUTO_REAL_MOUSE] real mouse step complete", {
         index,
         action: step.action,
+      });
+      emitAgentAction(`Done: ${stepTitle(step)}`, {
+        status: "done",
+        stepIndex: index,
       });
       sendOverlay("replay:progress", { index, total: steps.length, step });
     }

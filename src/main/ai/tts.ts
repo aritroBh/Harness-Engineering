@@ -7,13 +7,46 @@ import { safeLog, safeWarn, safeError } from "../logger";
 
 import OpenAI from "openai";
 
-const BRIAN_VOICE_ID = "nPczCjzI2devNBz1zQrb";
+// Specter speaks with ONE consistent feminine voice across all providers:
+// ElevenLabs "Rachel", OpenAI "shimmer", macOS "Samantha". Previously the
+// primary voice was masculine ("Brian") while every fallback was feminine,
+// so any provider hiccup made the voice flip back and forth mid-session.
+const RACHEL_VOICE_ID = "21m00Tcm4TlvDq8ikWAM";
 const DEFAULT_MODEL_ID = "eleven_flash_v2_5";
-const PROVIDER_TIMEOUT_MS = 20_000;
+// Keep fallback snappy — a 20s stall per sentence felt like a different
+// app. If a provider can't answer in 8s, the next one takes over.
+const PROVIDER_TIMEOUT_MS = 8_000;
+
+// Sticky provider selection: when a provider fails, bench it for a while
+// instead of retrying it on every sentence. This is what keeps the voice
+// from alternating — after one ElevenLabs failure, OpenAI (same feminine
+// register) handles the whole conversation until the bench expires.
+const PROVIDER_BENCH_MS = 10 * 60 * 1000;
+const providerBenchedUntil: Record<"elevenlabs" | "openai", number> = {
+  elevenlabs: 0,
+  openai: 0,
+};
+
+function providerAvailable(provider: "elevenlabs" | "openai"): boolean {
+  return Date.now() >= providerBenchedUntil[provider];
+}
+
+function benchProvider(provider: "elevenlabs" | "openai"): void {
+  providerBenchedUntil[provider] = Date.now() + PROVIDER_BENCH_MS;
+  safeWarn("[TTS] provider benched to keep one consistent voice", {
+    provider,
+    benchMinutes: PROVIDER_BENCH_MS / 60_000,
+  });
+}
+
+/** Test hook. */
+export function __resetTtsProviderBenchForTests(): void {
+  providerBenchedUntil.elevenlabs = 0;
+  providerBenchedUntil.openai = 0;
+}
 
 let activePlayback: ChildProcess | null = null;
 let activeRequest: AbortController | null = null;
-let speechRunId = 0;
 
 function waitForProcess(child: ChildProcess): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -45,7 +78,6 @@ async function playAudioFile(filePath: string): Promise<void> {
 }
 
 export async function stopSpeaking(): Promise<void> {
-  speechRunId += 1;
   if (activeRequest) {
     activeRequest.abort();
     activeRequest = null;
@@ -212,26 +244,28 @@ export async function speak(text: string): Promise<SpeakResult> {
 
   const elevenlabsKey = process.env.ELEVENLABS_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
-  const voiceId = process.env.ELEVENLABS_VOICE_ID || BRIAN_VOICE_ID;
+  const voiceId = process.env.ELEVENLABS_VOICE_ID || RACHEL_VOICE_ID;
   const modelId = process.env.ELEVENLABS_MODEL_ID || DEFAULT_MODEL_ID;
 
   const failures: { elevenlabs?: string; openai?: string } = {};
 
-  // 1. Try ElevenLabs
-  if (elevenlabsKey) {
+  // 1. Try ElevenLabs (skipped while benched after a recent failure)
+  if (elevenlabsKey && providerAvailable("elevenlabs")) {
     safeLog("[TTS] Calling ElevenLabs...", { voiceId, modelId });
     const result = await speakElevenLabs(text, elevenlabsKey, voiceId, modelId);
     if (result.ok) return { success: true, providerUsed: "elevenlabs" };
     safeWarn("[TTS] ElevenLabs failed", { reason: result.reason });
     failures.elevenlabs = result.reason;
+    benchProvider("elevenlabs");
   }
 
-  // 2. Try OpenAI TTS Fallback
-  if (openaiKey) {
+  // 2. Try OpenAI TTS Fallback (skipped while benched)
+  if (openaiKey && providerAvailable("openai")) {
     safeLog("[TTS] ElevenLabs failed or skipped; trying OpenAI TTS fallback");
     const result = await speakOpenAI(text, openaiKey);
     if (result.ok) return { success: true, providerUsed: "openai", failures };
     failures.openai = result.reason;
+    benchProvider("openai");
   }
 
   // 3. Last resort: macOS say

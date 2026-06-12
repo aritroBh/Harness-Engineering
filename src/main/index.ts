@@ -44,6 +44,11 @@ import {
 import { startVerification } from "./session/verificationLoop";
 import { seedDemoProfile, getProfile } from "./session/skillProfileStore";
 import { getPeekabooStatus } from "./automation/peekabooAdapter";
+import {
+  enterSplitScreen,
+  restoreSplitScreen,
+  SPLIT_RAIL_WIDTH,
+} from "./automation/splitScreen";
 import { speak, stopSpeaking } from "./ai/tts";
 import { transcribe } from "./ai/whisper";
 import { checkAIHealth } from "./ai/health";
@@ -121,7 +126,11 @@ import {
 } from "./security/automationGate";
 import { validateSender } from "./security/ipcGuards";
 
-import { startMemorySidecar } from "./memorySidecar";
+import {
+  DEFAULT_WIKI_ROOT,
+  postToMemoryService,
+  startMemorySidecar,
+} from "./memorySidecar";
 import {
   getContextHistory,
   getLatestContextSnapshot,
@@ -144,6 +153,7 @@ import { getForegroundAppLabel } from "./context/contextTracker";
 
 const icon = join(__dirname, "../../resources/icon.png");
 const DEFAULT_APP_NAME = "Specter";
+app.setName(DEFAULT_APP_NAME);
 const REAL_APP_CONFIDENCE_THRESHOLD = 0.65;
 
 function isBrokenPipeError(error: unknown): boolean {
@@ -671,8 +681,32 @@ function toggleOverlay(): void {
   // Once `overlayWindow.showInactive()` runs, Specter is the frontmost app
   // and any later AX dump walks our own empty transparent window. The probe
   // is fire-and-forget; detection pulls from the cache when it runs.
+  // The same capture drives real split-screen: the foreground app is pulled
+  // out of fullscreen and resized to the left of the rail.
   if (!overlayWindow.isVisible()) {
-    void captureForegroundAppNow("toggleOverlay summon");
+    const { display: summonDisplay } = getSummonDisplay();
+    void captureForegroundAppNow("toggleOverlay summon").then(
+      async (probedApp) => {
+        if (!probedApp?.pid) return;
+        const identifier = preferredAppIdentifier(probedApp) ?? "";
+        if (looksLikeSpecterSelf(identifier)) return;
+        // The probe is async — the user may have already dismissed the
+        // overlay again (double-shift spam). Don't split a screen nobody
+        // asked for.
+        if (!overlayWindow?.isVisible()) return;
+        const result = await enterSplitScreen({
+          pid: probedApp.pid,
+          appName: probedApp.name,
+          workArea: summonDisplay.workArea,
+          railWidth: SPLIT_RAIL_WIDTH,
+        });
+        // Split can take >1s when leaving fullscreen; if the overlay was
+        // dismissed mid-flight, put the window straight back.
+        if (result.ok && !overlayWindow?.isVisible()) {
+          void restoreSplitScreen();
+        }
+      },
+    );
   }
 
   const { display } = getSummonDisplay();
@@ -695,6 +729,8 @@ function toggleOverlay(): void {
     }
     overlayWindow.setIgnoreMouseEvents(true, { forward: true });
     overlayWindow.hide();
+    // Give the user their window back exactly as it was before the summon.
+    void restoreSplitScreen();
   } else {
     routeVisibleWindowsToDisplay(display);
     if (process.env.DEBUG_VERBOSE === "true") {
@@ -707,13 +743,17 @@ function toggleOverlay(): void {
     }
     overlayWindow.showInactive();
     overlayWindow.moveTop();
-    // Summon means the user wants to talk: take focus and put the caret in
-    // the input bar instead of waiting for a hover to enable interactivity.
-    overlayWindow.setIgnoreMouseEvents(false);
-    overlayWindow.focus();
-    overlayWindow.webContents.send("overlay:focus-input");
+    // Voice-only overlay: stay click-through so the user's app remains fully
+    // clickable after the summon. Hovering the mic or the progress rail
+    // flips interactivity via forwarded mouse events — clicking the mic is
+    // all the focus this UI needs.
+    overlayWindow.setIgnoreMouseEvents(true, { forward: true });
   }
-  safeSend(overlayWindow, "overlay:toggle");
+  // Explicit visibility state — a blind toggle event lets renderer state
+  // drift out of sync whenever main shows/hides the window on its own.
+  safeSend(overlayWindow, "overlay:visibility", {
+    visible: overlayWindow.isVisible(),
+  });
 }
 
 let lastShiftTime = 0;
@@ -851,7 +891,7 @@ app.whenReady().then(async () => {
       port: process.env.MEMORY_SERVICE_PORT || "8765",
     });
     safeLog("[STARTUP] Wiki Root:", {
-      root: process.env.GHOSTWIKI_WIKI_ROOT || "./wiki",
+      root: process.env.GHOSTWIKI_WIKI_ROOT || DEFAULT_WIKI_ROOT,
     });
     safeLog("[STARTUP] Cognee Enabled:", {
       enabled: process.env.COGNEE_ENABLED || "false",
@@ -960,6 +1000,8 @@ app.whenReady().then(async () => {
     stopAmbientAudioListener();
     setForegroundAppProvider(null);
     setBehavioralStateEmitter(null);
+    // Best-effort: never leave the user's window stuck at half size.
+    void restoreSplitScreen();
   });
 
   // IPC Handlers
@@ -967,6 +1009,8 @@ app.whenReady().then(async () => {
     if (!overlayWindow) return;
     overlayWindow.setIgnoreMouseEvents(true, { forward: true });
     overlayWindow.hide();
+    safeSend(overlayWindow, "overlay:visibility", { visible: false });
+    void restoreSplitScreen();
   });
 
   // Security Gate
@@ -1486,7 +1530,6 @@ app.whenReady().then(async () => {
     return { ok: true };
   });
 
-
   ipcMain.handle("agent:compileNoteHtml", async (event, input) => {
     if (!validateSender(event, overlayWindow))
       throw new Error("Unauthorized sender");
@@ -1916,7 +1959,7 @@ app.whenReady().then(async () => {
       }
 
       const pages = compileSessionToWiki(session, appName);
-      const wikiRoot = process.env.GHOSTWIKI_WIKI_ROOT || "./wiki";
+      const wikiRoot = process.env.GHOSTWIKI_WIKI_ROOT || DEFAULT_WIKI_ROOT;
 
       const filepaths: string[] = [];
       for (const page of pages) {
@@ -1924,14 +1967,17 @@ app.whenReady().then(async () => {
         if (path) filepaths.push(path);
       }
 
-      const port = process.env.MEMORY_SERVICE_PORT || "8765";
-      const res = await fetch(`http://127.0.0.1:${port}/ingest`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ files: filepaths }),
+      safeLog("[GhostWiki] Ingesting session wiki pages", {
+        sessionId,
+        fileCount: filepaths.length,
+        wikiRoot,
       });
-
-      return res.json();
+      const data = await postToMemoryService("/ingest", { files: filepaths });
+      safeLog("[GhostWiki] Ingest complete", {
+        mode: data.mode,
+        sourcesIngested: data.sources_ingested,
+      });
+      return data;
     },
   );
 
@@ -1944,8 +1990,6 @@ app.whenReady().then(async () => {
       feedbackType,
       feedbackDetails,
     ) => {
-      const port = process.env.MEMORY_SERVICE_PORT || "8765";
-
       let correctionPath: string | null = null;
       if (feedbackType && feedbackDetails && feedbackSourceSessionId) {
         // It's a feedback loop
@@ -1957,28 +2001,27 @@ app.whenReady().then(async () => {
           feedbackDetails,
           queryText,
         );
-        const wikiRoot = process.env.GHOSTWIKI_WIKI_ROOT || "./wiki";
+        const wikiRoot = process.env.GHOSTWIKI_WIKI_ROOT || DEFAULT_WIKI_ROOT;
         const filepath = writeWikiPage(page, wikiRoot);
         correctionPath = filepath;
 
         // Re-ingest
         if (filepath) {
-          await fetch(`http://127.0.0.1:${port}/ingest`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ files: [filepath] }),
-          });
+          safeLog("[GhostWiki] Re-ingesting correction page", { filepath });
+          await postToMemoryService("/ingest", { files: [filepath] });
         }
       }
 
-      // Normal query
-      const res = await fetch(`http://127.0.0.1:${port}/query`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: queryText }),
+      safeLog("[GhostWiki] Query", { query: queryText?.slice(0, 120) });
+      const jsonRes = await postToMemoryService("/query", {
+        query: queryText,
       });
-
-      const jsonRes = await res.json();
+      safeLog("[GhostWiki] Query result", {
+        mode: jsonRes.mode,
+        sourceCount: Array.isArray(jsonRes.sources)
+          ? jsonRes.sources.length
+          : 0,
+      });
       if (correctionPath) {
         return { ...jsonRes, correctionPath };
       }
@@ -1992,7 +2035,7 @@ app.whenReady().then(async () => {
       const res = await fetch(`http://127.0.0.1:${port}/health`);
       const data = await res.json();
       const configuredWikiRoot =
-        process.env.GHOSTWIKI_WIKI_ROOT || "./demo-workflows/event-recap/wiki";
+        process.env.GHOSTWIKI_WIKI_ROOT || DEFAULT_WIKI_ROOT;
       const warnings: string[] = [];
       if (
         typeof data.wiki_root === "string" &&
@@ -2021,14 +2064,21 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle("ghostwiki:lint", async () => {
-    const port = process.env.MEMORY_SERVICE_PORT || "8765";
-    const res = await fetch(`http://127.0.0.1:${port}/lint`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    });
-
-    return res.json();
+    try {
+      const data = await postToMemoryService("/lint");
+      safeLog("[GhostWiki] Lint complete", {
+        issueCount: Array.isArray(data.issues) ? data.issues.length : 0,
+      });
+      return data;
+    } catch (e: any) {
+      safeError("[GhostWiki] Lint failed", e);
+      return {
+        ok: false,
+        mode: "offline",
+        warnings: [e?.message || "Memory service offline"],
+        issues: [],
+      };
+    }
   });
 
   registerReplayIpc(ipcMain, () => overlayWindow);

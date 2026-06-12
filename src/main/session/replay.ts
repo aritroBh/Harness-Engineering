@@ -9,6 +9,7 @@ import { resolveTarget } from "../automation/targetResolver";
 import { isPeekabooAvailable } from "../automation/peekabooAdapter";
 import {
   createReplayController,
+  emitAgentAction,
   isActive,
   releaseReplayController,
   ReplayController,
@@ -20,6 +21,7 @@ import {
   sleep,
   stopReplay,
 } from "./replayController";
+import { refreshStepTarget } from "./stepRefresher";
 import { assertWalkthroughReplaySafety } from "./replaySafety";
 import { validateSender } from "../security/ipcGuards";
 import { validateAutomationAction } from "../security/automationGate";
@@ -317,7 +319,23 @@ export async function replayWalkthrough(
   try {
     for (let index = 0; index < steps.length; index++) {
       if (!isActive(controller)) break;
-      const step = steps[index];
+      // Ground the ghost on the *live* screen: re-resolve the step's target
+      // label against the frontmost app's accessibility tree so the ghost
+      // points at where the element actually is, not where it was when the
+      // workflow was saved. Read-only — walkthrough still never moves the
+      // real mouse.
+      const step = await refreshStepTarget(steps[index], { forceFresh: true });
+      if (step.liveResolved) {
+        emitAgentAction(`Found "${step.liveMatchedLabel}" on screen`, {
+          detail: `match ${Math.round((step.liveConfidence ?? 0) * 100)}% · live coordinates`,
+          status: "info",
+          stepIndex: index,
+        });
+      }
+      emitAgentAction(`Guiding you: ${stepTitle(step)}`, {
+        status: "running",
+        stepIndex: index,
+      });
       let result: TargetWaitResult = "timeout";
       let attempts = 0;
 
@@ -428,6 +446,10 @@ export async function replayWalkthrough(
             index,
             action: step.action,
             title: stepTitle(step),
+          });
+          emitAgentAction(`Done: ${stepTitle(step)}`, {
+            status: "done",
+            stepIndex: index,
           });
         } else if (result === "timeout") {
           attempts++;

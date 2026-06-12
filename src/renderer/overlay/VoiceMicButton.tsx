@@ -1,9 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MicRecorder } from "./MicRecorder";
 import { RecordingOverlay } from "./RecordingOverlay";
+import type { UltraState } from "./UltraReplyBubble";
 
 interface VoiceMicButtonProps {
   disabled?: boolean;
+  /** Conversation state from the parent — drives the status pill. */
+  conversationState?: UltraState;
+  /** True when TTS fell back to the local macOS voice. */
+  voiceFallback?: boolean;
   onSpokenInput: (text: string) => void;
   onTranscriptionStart?: () => void;
   onTranscriptionEnd?: () => void;
@@ -13,8 +18,16 @@ interface VoiceMicButtonProps {
   onRecordingStart?: () => void;
 }
 
+const CONVERSATION_LABEL: Record<string, string> = {
+  transcribing: "Hearing you…",
+  thinking: "Thinking…",
+  speaking: "Speaking…",
+};
+
 export const VoiceMicButton: React.FC<VoiceMicButtonProps> = ({
   disabled = false,
+  conversationState = "idle",
+  voiceFallback = false,
   onSpokenInput,
   onTranscriptionStart,
   onTranscriptionEnd,
@@ -141,6 +154,16 @@ export const VoiceMicButton: React.FC<VoiceMicButtonProps> = ({
   const isOverlayVisible =
     micState === "recording" || micState === "transcribing";
 
+  // While the mic itself is idle, surface what the conversation is doing
+  // (thinking, speaking) so a voice-only UI never feels dead.
+  const statusLabel =
+    micState === "recording"
+      ? "Listening… click to send"
+      : micState === "transcribing"
+        ? "Hearing you…"
+        : (CONVERSATION_LABEL[conversationState] ?? "");
+  const showStatus = Boolean(statusLabel);
+
   return (
     <>
       {isOverlayVisible && (
@@ -163,9 +186,11 @@ export const VoiceMicButton: React.FC<VoiceMicButtonProps> = ({
           className={`voice-mic-float__btn ${
             micState === "recording"
               ? "is-live"
-              : micState === "transcribing"
+              : micState === "transcribing" || conversationState === "thinking"
                 ? "is-busy"
-                : "is-muted"
+                : conversationState === "speaking"
+                  ? "is-speaking"
+                  : "is-ready"
           }`}
           disabled={disabled || micState === "transcribing"}
           onClick={() => {
@@ -180,16 +205,17 @@ export const VoiceMicButton: React.FC<VoiceMicButtonProps> = ({
               ? "Mic live — click to stop and send"
               : micState === "transcribing"
                 ? "Transcribing..."
-                : "Mic muted — click to talk"
+                : "Click to talk to Specter"
           }
           title={
             micState === "recording"
               ? "Mic live — click to stop"
               : micState === "transcribing"
                 ? "Transcribing..."
-                : "Mic muted — click to talk"
+                : "Click to talk to Specter"
           }
         >
+          <span className="voice-mic-float__halo" aria-hidden="true" />
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M12 14.5a3.5 3.5 0 0 0 3.5-3.5V6.5a3.5 3.5 0 0 0-7 0V11a3.5 3.5 0 0 0 3.5 3.5Z"
@@ -207,17 +233,22 @@ export const VoiceMicButton: React.FC<VoiceMicButtonProps> = ({
               strokeLinejoin="round"
               strokeWidth="1.8"
             />
-            {micState !== "recording" && micState !== "transcribing" && (
-              <path
-                d="M4.5 3.5l15 17"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeWidth="2"
-              />
-            )}
           </svg>
         </button>
+        {showStatus && (
+          <div
+            className={`voice-mic-float__status voice-mic-float__status--${
+              micState === "recording" ? "live" : conversationState
+            }`}
+            role="status"
+          >
+            <span className="voice-mic-float__status-dot" aria-hidden="true" />
+            {statusLabel}
+            {voiceFallback && conversationState === "speaking" && (
+              <span className="voice-mic-float__status-sub">local voice</span>
+            )}
+          </div>
+        )}
         {micMessage && (
           <div className="voice-mic-float__hint">{micMessage}</div>
         )}

@@ -4,13 +4,14 @@ import { homedir } from "os";
 import { join, resolve, basename } from "path";
 import { is } from "@electron-toolkit/utils";
 import { safeLog, safeError } from "./logger";
+import { DEFAULT_WIKI_ROOT } from "./memorySidecar";
 
 let dashboardWindow: BrowserWindow | null = null;
 
 function wikiRoot(): string {
   return resolve(
     process.cwd(),
-    process.env.GHOSTWIKI_WIKI_ROOT || "./demo-workflows/event-recap/wiki",
+    process.env.GHOSTWIKI_WIKI_ROOT || DEFAULT_WIKI_ROOT,
   );
 }
 
