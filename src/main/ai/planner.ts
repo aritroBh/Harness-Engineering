@@ -570,26 +570,13 @@ export function parseUltraLiveTarget(
   };
 }
 
-function fallbackUltraReply(message: string): UltraConverseResult {
-  const lower = message.toLowerCase();
-  if (lower.includes("what") && lower.includes("next")) {
-    return {
-      reply:
-        "Move your cursor toward the highlighted target. I will wait until you are close.",
-      intent: "repeat_step",
-      shouldSpeak: true,
-    };
-  }
-  if (lower.includes("why")) {
-    return {
-      reply: "This is the next step to accomplish your goal. Keep going!",
-      intent: "clarify",
-      shouldSpeak: true,
-    };
-  }
+// When the model is unreachable, say so. The old keyword-matched canned
+// replies ("Just follow the ghost cursor") ignored what the user actually
+// asked, which read as the ghost talking nonsense.
+function fallbackUltraReply(_message: string): UltraConverseResult {
   return {
     reply:
-      "I am here to help you through the steps. Just follow the ghost cursor.",
+      "I couldn't reach my AI service just now, so I can't answer that properly. Check the Anthropic API key and your network, then ask me again.",
     intent: "answer",
     shouldSpeak: true,
   };

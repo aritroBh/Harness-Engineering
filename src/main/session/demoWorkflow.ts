@@ -1,4 +1,4 @@
-import { BrowserWindow, screen } from "electron";
+import { app, BrowserWindow, screen } from "electron";
 import { normalizePracticeWindowTargetToViewportPercent } from "../screenCoordinates";
 import type { Step } from "./types";
 
@@ -139,17 +139,24 @@ import { safeLog } from "../logger";
 export function getDemoWorkflow() {
   const specterMode = process.env.SPECTER_MODE || "ghostwiki";
   if (specterMode === "ghostwiki") {
+    // cwd only matches the repo root in `npm run dev`; the packaged app and
+    // launches from other directories need the app path.
+    const roots = [process.cwd()];
     try {
-      const p = path.join(
-        process.cwd(),
-        "demo-workflows/event-recap/graph.json",
-      );
-      if (fs.existsSync(p)) {
-        const data = JSON.parse(fs.readFileSync(p, "utf-8"));
-        return data;
+      const appPath = app.getAppPath();
+      if (appPath && !roots.includes(appPath)) roots.push(appPath);
+    } catch {
+      // app not ready / non-electron context (ts-node scripts)
+    }
+    for (const root of roots) {
+      try {
+        const p = path.join(root, "demo-workflows/event-recap/graph.json");
+        if (fs.existsSync(p)) {
+          return JSON.parse(fs.readFileSync(p, "utf-8"));
+        }
+      } catch (e) {
+        safeLog("Failed to load ghostwiki demo graph", e);
       }
-    } catch (e) {
-      safeLog("Failed to load ghostwiki demo graph", e);
     }
   }
   return null;

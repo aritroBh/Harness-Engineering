@@ -19,6 +19,7 @@
     "test:specter": "npx ts-node scripts/test-specter.ts",
     "test:splitscreen": "npx ts-node scripts/test-splitscreen.ts",
     "test:step-history": "npx ts-node --transpile-only scripts/test-step-history.ts",
+    "test:transcript-filter": "npx ts-node --transpile-only scripts/test-transcript-filter.ts",
     "verify:openui": "npm run build && npx ts-node --transpile-only scripts/verify-openui.ts",
     "test:live-ghost": "npx ts-node --transpile-only scripts/test-live-ghost-unit.ts",
     "test:ultra-grounding": "npx ts-node --transpile-only scripts/test-ultra-live-target-grounding.ts",

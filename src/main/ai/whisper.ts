@@ -136,7 +136,10 @@ export async function transcribe(audioBuffer: Buffer): Promise<WhisperResult> {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   const primaryModel =
     process.env.GEMINI_TRANSCRIBE_MODEL || "gemini-2.5-flash";
-  const fallbackModel = "gemini-2.0-flash";
+  // gemini-2.0-flash is retired (generateContent returns 404), so it can
+  // never back up the primary. flash-lite is current and audio-capable.
+  const fallbackModel =
+    process.env.GEMINI_TRANSCRIBE_FALLBACK_MODEL || "gemini-2.5-flash-lite";
 
   safeLog("[WHISPER] received buffer", {
     bufferSize: audioBuffer?.length || 0,
