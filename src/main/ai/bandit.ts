@@ -106,9 +106,16 @@ export function recordReward(
   const normalized = normalizeBanditState(banditState);
   const [alpha, beta] = normalized[arm];
 
+  // Clamp to [0, 1]: a Bernoulli-style reward outside this range would push
+  // alpha or beta non-positive and silently reset the arm on the next normalize.
+  const safeReward =
+    typeof reward === "number" && Number.isFinite(reward)
+      ? Math.min(1, Math.max(0, reward))
+      : 0;
+
   const updated = {
     ...normalized,
-    [arm]: [alpha + reward, beta + (1 - reward)],
+    [arm]: [alpha + safeReward, beta + (1 - safeReward)],
   };
 
   const winningStyle = getCurrentStyle(updated);

@@ -33,9 +33,9 @@ interface AnthropicHealth {
   };
 }
 
-interface OpenAIHealth {
+interface GeminiHealth {
   key: KeyHealth;
-  whisperConfigured: boolean;
+  transcribeConfigured: boolean;
 }
 
 interface ElevenLabsHealth {
@@ -46,7 +46,7 @@ interface ElevenLabsHealth {
   reason?: string;
 }
 
-interface OpenAITTSHealth {
+interface GeminiTTSHealth {
   key: KeyHealth;
   configured: boolean;
   model: string;
@@ -65,8 +65,8 @@ export interface AIHealthResult {
   ok: boolean;
   overall: OverallHealth;
   anthropic: AnthropicHealth;
-  openai: OpenAIHealth;
-  openaiTTS: OpenAITTSHealth;
+  gemini: GeminiHealth;
+  geminiTTS: GeminiTTSHealth;
   elevenlabs: ElevenLabsHealth;
 }
 
@@ -113,7 +113,7 @@ const DEFAULT_MODEL_ID = "eleven_turbo_v2";
 
 export async function checkAIHealth(): Promise<AIHealthResult> {
   const anthropicKey = keyHealth(getAnthropicApiKey());
-  const openaiKey = keyHealth(process.env.OPENAI_API_KEY);
+  const geminiKey = keyHealth(process.env.GEMINI_API_KEY);
   const elevenlabsKey = keyHealth(process.env.ELEVENLABS_API_KEY);
   const useLocalModel = getUseLocalModel();
   const baseURL = getAnthropicBaseUrlForMode();
@@ -139,15 +139,15 @@ export async function checkAIHealth(): Promise<AIHealthResult> {
         pass: false,
       },
     },
-    openai: {
-      key: openaiKey,
-      whisperConfigured: openaiKey.present && !openaiKey.placeholderDetected,
+    gemini: {
+      key: geminiKey,
+      transcribeConfigured: geminiKey.present && !geminiKey.placeholderDetected,
     },
-    openaiTTS: {
-      key: openaiKey,
-      configured: openaiKey.present && !openaiKey.placeholderDetected,
-      model: process.env.OPENAI_TTS_MODEL || "gpt-4o-mini-tts",
-      voice: process.env.OPENAI_TTS_VOICE || "nova",
+    geminiTTS: {
+      key: geminiKey,
+      configured: geminiKey.present && !geminiKey.placeholderDetected,
+      model: process.env.GEMINI_TTS_MODEL || "gemini-2.5-flash-preview-tts",
+      voice: process.env.GEMINI_TTS_VOICE || "Kore",
     },
     elevenlabs: {
       key: elevenlabsKey,
@@ -221,13 +221,13 @@ export async function checkAIHealth(): Promise<AIHealthResult> {
 
   result.overall.readyForRealAppAI =
     result.anthropic.configured && result.anthropic.testRequest.pass;
-  result.overall.readyForVoiceInput = result.openai.whisperConfigured;
+  result.overall.readyForVoiceInput = result.gemini.transcribeConfigured;
 
   // "configured" = key present; runtime test NOT performed here (expensive).
   // Use naturalVoiceConfiguredOnly=true to signal that "ready" means configured,
   // not verified. Use the testVoiceOutput IPC to do a live end-to-end check.
   const voiceProviderConfigured =
-    result.elevenlabs.configured || result.openaiTTS.configured;
+    result.elevenlabs.configured || result.geminiTTS.configured;
   result.overall.readyForNaturalVoiceOutput = voiceProviderConfigured;
   result.overall.naturalVoiceConfiguredOnly = voiceProviderConfigured;
 

@@ -52,7 +52,8 @@
     "dotenv": "^16.4.7",
     "openai": "^4.76.0",
     "uiohook-napi": "^1.5.3",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
   },
   "optionalDependencies": {
     "node-mac-permissions": "^2.5.0"

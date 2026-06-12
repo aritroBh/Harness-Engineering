@@ -251,20 +251,20 @@ function formatAIHealthStatus(health: any): string {
   const anthropic = health?.anthropic || {};
   const anthropicKey = anthropic.key || {};
   const testRequest = anthropic.testRequest || {};
-  const openai = health?.openai || {};
-  const openaiKey = openai.key || {};
+  const gemini = health?.gemini || {};
+  const geminiKey = gemini.key || {};
   const elevenlabs = health?.elevenlabs || {};
   const elevenlabsKey = elevenlabs.key || {};
-  const openaiTTS = health?.openaiTTS || {};
+  const geminiTTS = health?.geminiTTS || {};
   const overall = health?.overall || {};
 
   const claudeTextStatus = testRequest.pass
     ? "Claude text test: pass"
     : `Claude text test: failed (${testRequest.category || "unknown"})`;
   const claudeVisionStatus = `Claude vision/config: ${anthropic.configured ? "ready" : "not configured"}`;
-  const whisperStatus = `Whisper voice: ${openai.whisperConfigured ? "ready" : "missing key"}`;
+  const whisperStatus = `Voice input (Gemini): ${gemini.transcribeConfigured ? "ready" : "missing key"}`;
   const elevenlabsStatus = `ElevenLabs TTS: ${elevenlabs.configured ? "ready" : "fallback mode"}`;
-  const openaiTTSStatus = `OpenAI TTS: ${openaiTTS.configured ? "ready" : "not configured"}`;
+  const geminiTTSStatus = `Gemini TTS: ${geminiTTS.configured ? "ready" : "not configured"}`;
 
   const overallAppAI = overall.readyForRealAppAI ? "ready" : "not ready";
   const overallVoiceInput = overall.readyForVoiceInput ? "ready" : "not ready";
@@ -283,10 +283,10 @@ function formatAIHealthStatus(health: any): string {
     `Planner: ${anthropic.plannerModel || "unknown"}, Vision: ${anthropic.visionModel || "unknown"}`,
     whisperStatus,
     elevenlabsStatus,
-    openaiTTSStatus,
+    geminiTTSStatus,
     `Voice: ${elevenlabs.voiceId || "default"}, Model: ${elevenlabs.modelId || "default"}`,
     `ANTHROPIC_API_KEY: ${anthropicKey.present ? "present" : "missing"}, len: ${anthropicKey.keyLength || 0}, placeholder: ${anthropicKey.placeholderDetected ? "true" : "false"}`,
-    `OPENAI_API_KEY: ${openaiKey.present ? "present" : "missing"}, len: ${openaiKey.keyLength || 0}, placeholder: ${openaiKey.placeholderDetected ? "true" : "false"}`,
+    `GEMINI_API_KEY: ${geminiKey.present ? "present" : "missing"}, len: ${geminiKey.keyLength || 0}, placeholder: ${geminiKey.placeholderDetected ? "true" : "false"}`,
     `ELEVENLABS_API_KEY: ${elevenlabsKey.present ? "present" : "missing"}, len: ${elevenlabsKey.keyLength || 0}, placeholder: ${elevenlabsKey.placeholderDetected ? "true" : "false"}`,
     `Local model: ${anthropic.useLocalModel ? "enabled" : "disabled"}, base: ${anthropic.baseURLKind || "unknown"}${reason}`,
   ].join("\n");
@@ -471,7 +471,7 @@ const OverlayApp: React.FC = () => {
   const [contextReadActive, setContextReadActive] = useState(false);
   const [memorySearchActive, setMemorySearchActive] = useState(false);
   const [lastTTSProvider, setLastTTSProvider] = useState<
-    "elevenlabs" | "openai" | "macos" | null
+    "elevenlabs" | "gemini" | "macos" | null
   >(null);
   const [screenState, setScreenState] = useState<any>(null);
   // No text input remains — voice only. Kept as a constant so the
@@ -565,8 +565,8 @@ const OverlayApp: React.FC = () => {
           }
           if (result?.providerUsed === "macos" && result?.fallbackReason) {
             console.warn("[TTS] used macOS fallback", result.fallbackReason);
-          } else if (result?.providerUsed === "openai") {
-            console.log("[TTS] used OpenAI fallback");
+          } else if (result?.providerUsed === "gemini") {
+            console.log("[TTS] used Gemini fallback");
           }
           void (async () => {
             if (modeRef.current !== "ultra" && !demoPresentationRef.current) {
@@ -3756,9 +3756,9 @@ const OverlayApp: React.FC = () => {
                                   ?.category || "failing",
                           },
                           {
-                            label: "Whisper",
-                            ok: aiHealthPills?.openai?.whisperConfigured,
-                            detail: aiHealthPills?.openai?.whisperConfigured
+                            label: "Voice in",
+                            ok: aiHealthPills?.gemini?.transcribeConfigured,
+                            detail: aiHealthPills?.gemini?.transcribeConfigured
                               ? "ready"
                               : "missing key",
                           },
@@ -3766,11 +3766,11 @@ const OverlayApp: React.FC = () => {
                             label: "Voice",
                             ok:
                               aiHealthPills?.elevenlabs?.configured ||
-                              aiHealthPills?.openaiTTS?.configured,
+                              aiHealthPills?.geminiTTS?.configured,
                             detail: aiHealthPills?.elevenlabs?.configured
                               ? "ElevenLabs"
-                              : aiHealthPills?.openaiTTS?.configured
-                                ? "OpenAI TTS"
+                              : aiHealthPills?.geminiTTS?.configured
+                                ? "Gemini TTS"
                                 : lastTTSProvider === "macos"
                                   ? "macOS fallback"
                                   : "macOS fallback",
@@ -3870,20 +3870,20 @@ const OverlayApp: React.FC = () => {
                           const res = await api.testVoiceOutput();
                           const providerNames: Record<string, string> = {
                             elevenlabs: "ElevenLabs",
-                            openai: "OpenAI TTS",
+                            gemini: "Gemini TTS",
                             macos: "macOS Fallback (Robotic)",
                           };
                           let msg = `Voice test OK - used ${providerNames[res.providerUsed] || res.providerUsed}.`;
                           if (res.failures?.elevenlabs) {
                             msg += `\nElevenLabs failed: ${res.failures.elevenlabs}`;
                           }
-                          if (res.failures?.openai) {
-                            msg += `\nOpenAI TTS failed: ${res.failures.openai}`;
+                          if (res.failures?.gemini) {
+                            msg += `\nGemini TTS failed: ${res.failures.gemini}`;
                           }
                           if (
                             res.providerUsed === "macos" &&
                             !res.failures?.elevenlabs &&
-                            !res.failures?.openai &&
+                            !res.failures?.gemini &&
                             res.fallbackReason
                           ) {
                             msg += `\nReason: ${res.fallbackReason}`;

@@ -177,11 +177,11 @@ async function main() {
   const sourceFiles = listFiles("src").filter((file) =>
     /\.(ts|tsx)$/.test(file),
   );
-  const rendererFilesReadingOpenAIKey = sourceFiles.filter((file) => {
+  const rendererFilesReadingGeminiKey = sourceFiles.filter((file) => {
     const content = readFile(file);
     return (
       (file.includes("/renderer/") || file.includes("/preload/")) &&
-      /process\.env\.OPENAI_API_KEY|import\.meta\.env\.[A-Z0-9_]*OPENAI_API_KEY/.test(
+      /process\.env\.GEMINI_API_KEY|import\.meta\.env\.[A-Z0-9_]*GEMINI_API_KEY/.test(
         content,
       )
     );
@@ -196,15 +196,15 @@ async function main() {
     ".env is listed in .gitignore",
   );
   check(
-    rendererFilesReadingOpenAIKey.length === 0,
-    "OPENAI_API_KEY is not read from renderer/preload code",
+    rendererFilesReadingGeminiKey.length === 0,
+    "GEMINI_API_KEY is not read from renderer/preload code",
   );
 
   for (const key of [
     "ANTHROPIC_API_KEY",
     "NVIDIA_API_KEY",
     "ELEVENLABS_API_KEY",
-    "OPENAI_API_KEY",
+    "GEMINI_API_KEY",
   ]) {
     const match = envContent.match(new RegExp("^" + key + "=(.+)$", "m"));
     warnIf(
@@ -726,15 +726,13 @@ async function main() {
 
   const micRecorder = readFile("src/renderer/overlay/MicRecorder.ts");
   const transcribeBody = exportedFunctionBody(whisperBody, "transcribe");
-  const openAICallIndex = transcribeBody.indexOf(
-    "openai.audio.transcriptions.create",
-  );
+  const apiCallIndex = transcribeBody.indexOf("requestTranscription");
   const emptyBufferGuardIndex = transcribeBody.indexOf(
     "audioBuffer.length === 0",
   );
 
   check(
-    whisperBody.includes("classifyWhisperError"),
+    whisperBody.includes("classifyTranscribeError"),
     "whisper.ts classifies errors for the renderer",
   );
   check(
@@ -742,9 +740,9 @@ async function main() {
     "whisper.ts returns structured result objects",
   );
   check(
-    whisperBody.includes("gpt-4o-mini-transcribe") &&
-      whisperBody.includes("whisper-1"),
-    "whisper.ts supports gpt-4o-mini-transcribe with whisper-1 fallback",
+    whisperBody.includes("gemini-2.5-flash") &&
+      whisperBody.includes("gemini-2.0-flash"),
+    "whisper.ts supports gemini-2.5-flash with gemini-2.0-flash fallback",
   );
   check(
     inputBarBody.includes('result.message || "No transcription returned'),
@@ -752,32 +750,31 @@ async function main() {
   );
 
   check(
-    !/new\s+File\s*\(/.test(whisperBody),
-    "whisper.ts does not use global File",
+    !whisperBody.includes('from "openai"') &&
+      !whisperBody.includes('from "openai/uploads"'),
+    "whisper.ts no longer depends on the openai SDK",
   );
   check(
-    /import \{ toFile \} from ['"]openai\/uploads['"]/.test(whisperBody),
-    "whisper.ts uses toFile from openai/uploads",
+    whisperBody.includes("generativelanguage.googleapis.com"),
+    "whisper.ts calls the Gemini REST endpoint",
   );
   check(
-    /import \{ File as NodeFile \} from ['"]node:buffer['"]/.test(whisperBody),
-    "whisper.ts imports File as NodeFile from node:buffer",
+    /:generateContent\?key=/.test(whisperBody),
+    "whisper.ts uses Gemini generateContent with an API key",
   );
   check(
-    whisperBody.includes("globalThis.File") &&
-      whisperBody.includes("undefined"),
-    "whisper.ts assigns globalThis.File when undefined",
+    whisperBody.includes("inline_data") &&
+      whisperBody.includes('toString("base64")'),
+    "whisper.ts sends audio as base64 inline_data",
   );
   check(
     emptyBufferGuardIndex !== -1 &&
-      (openAICallIndex === -1 || emptyBufferGuardIndex < openAICallIndex),
-    "Whisper returns before OpenAI when buffer length is 0",
+      (apiCallIndex === -1 || emptyBufferGuardIndex < apiCallIndex),
+    "Whisper returns before calling Gemini when buffer length is 0",
   );
   check(
-    whisperBody.includes(
-      "[WHISPER] installed Node File polyfill for OpenAI uploads",
-    ),
-    "whisper.ts logs File polyfill installation",
+    whisperBody.includes("GEMINI_API_KEY"),
+    "whisper.ts reads GEMINI_API_KEY",
   );
   check(
     whisperBody.includes("[WHISPER] received buffer"),
@@ -823,9 +820,9 @@ async function main() {
     "transcription populates input instead of submitting empty/implicit text",
   );
   check(
-    whisperBody.includes("WHISPER_TIMEOUT_MS") &&
-      whisperBody.includes("Promise.race"),
-    "whisper.ts implements transcription timeout via Promise.race",
+    whisperBody.includes("TRANSCRIBE_TIMEOUT_MS") &&
+      whisperBody.includes("AbortController"),
+    "whisper.ts implements transcription timeout via AbortController",
   );
   check(
     inputBarBody.includes("Transcription timed out"),
@@ -853,10 +850,8 @@ async function main() {
     "InputBar mic reset does not use stale micState condition",
   );
   check(
-    !/export\s+async\s+function\s+transcribe[\s\S]*?typeof\s+globalThis\.File/.test(
-      whisperBody,
-    ),
-    "whisper.ts installs globalThis.File at module load, not inside transcribe",
+    !whisperBody.includes("globalThis.File"),
+    "whisper.ts no longer needs a globalThis.File polyfill",
   );
 
   printHeader("Planner and Screener Safety");
@@ -1135,8 +1130,9 @@ async function main() {
     "AI health uses a tiny text-only Anthropic test request",
   );
   check(
-    health.includes("OPENAI_API_KEY") && health.includes("whisperConfigured"),
-    "AI health reports OpenAI Whisper configuration",
+    health.includes("GEMINI_API_KEY") &&
+      health.includes("transcribeConfigured"),
+    "AI health reports Gemini voice configuration",
   );
   check(
     health.includes("ELEVENLABS_API_KEY") &&
@@ -1144,13 +1140,13 @@ async function main() {
     "AI health reports ElevenLabs configuration",
   );
   check(
-    health.includes("openaiTTS") && health.includes("OpenAITTSHealth"),
-    "AI health reports OpenAI TTS configuration",
+    health.includes("geminiTTS") && health.includes("GeminiTTSHealth"),
+    "AI health reports Gemini TTS configuration",
   );
   check(
     health.includes("readyForNaturalVoiceOutput") &&
       (health.includes("elevenlabs.configured") ||
-        health.includes("openaiTTS.configured")),
+        health.includes("geminiTTS.configured")),
     "AI health marks natural voice ready if either provider is available",
   );
 
@@ -1217,7 +1213,7 @@ async function main() {
     "logger.ts exports safeError",
   );
   check(
-    logger.includes("REDACTED") && logger.includes("OPENAI_API_KEY"),
+    logger.includes("REDACTED") && logger.includes("GEMINI_API_KEY"),
     "logger redacts secret-shaped values before printing",
   );
   check(
@@ -1256,7 +1252,7 @@ async function main() {
     "index.ts uses safeSend for overlay events",
   );
   const tts = readFile("src/main/ai/tts.ts");
-  check(tts.includes("speakOpenAI"), "TTS has OpenAI fallback logic");
+  check(tts.includes("speakGemini"), "TTS has Gemini fallback logic");
   check(
     tts.includes("SpeakResult") && tts.includes("providerUsed"),
     "TTS returns provider details",

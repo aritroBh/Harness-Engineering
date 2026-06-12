@@ -108,6 +108,26 @@ export function createBundle(
   };
 }
 
+// Heuristic detection of HIPAA identifiers (18 safe-harbor categories, common
+// subset). Used to set bundle.containsPhi so the UCSF AI routing gate can refuse
+// to send real patient data to commercial endpoints. Conservative by design:
+// false positives only tighten routing; they never loosen it.
+const PHI_PATTERNS: RegExp[] = [
+  /\b\d{3}-\d{2}-\d{4}\b/, // SSN
+  /\bMRN\b[:#\s]*\d{3,}/i, // medical record number
+  /\bmedical record (?:number|no\.?|#)\b/i,
+  /\b(?:DOB|date of birth)\b/i,
+  /\b\d{1,2}\/\d{1,2}\/\d{4}\b/, // dates (DOB / encounter)
+  /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/, // phone
+  /\b[\w.+-]+@[\w-]+\.[\w.-]+\b/, // email
+  /\b(?:acct|account|policy|insurance)\s*(?:#|no\.?|number)?[:\s]*\d{4,}/i,
+];
+
+export function detectPhi(text: string): boolean {
+  if (!text) return false;
+  return PHI_PATTERNS.some((rx) => rx.test(text));
+}
+
 export function addSource(
   bundle: ClinicalContextBundle,
   source: ClinicalSourceNote,
@@ -119,6 +139,20 @@ export function addSource(
     return { bundle, deduped: true };
   }
   bundle.sources.push(source);
+
+  // Populate the PHI flag from captured content. Explicitly synthetic bundles
+  // keep whatever the operator asserted; anything from a real institution, or
+  // any note carrying PHI markers, flips the gate on (fail-safe, never reset).
+  if (bundle.institution !== "synthetic") {
+    const realInstitution =
+      bundle.institution === "ucsf_health" ||
+      bundle.institution === "ucsf_other" ||
+      bundle.institution === "non_ucsf";
+    if (bundle.containsPhi !== true) {
+      bundle.containsPhi = realInstitution || detectPhi(source.rawText);
+    }
+  }
+
   return { bundle, deduped: false };
 }
 

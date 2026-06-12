@@ -68,6 +68,9 @@ export function validateAutomationAction(
     return false;
   }
   currentSession.stepsConsumed += count;
+  // Slide the inactivity window forward so a long, active walkthrough does not
+  // expire mid-sequence; the step budget remains the hard cap on total actions.
+  currentSession.expiresAt = Date.now() + 60000;
   safeLog(`[AUTOMATION_GATE] Allowed ${action}`, {
     consumed: currentSession.stepsConsumed,
     allowed: currentSession.stepsAllowed,

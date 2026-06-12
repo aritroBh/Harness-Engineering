@@ -1,5 +1,6 @@
 import os
 import logging
+from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from .schemas import IngestRequest, IngestResponse, QueryRequest, QueryResponse, LintRequest, LintResponse
@@ -68,21 +69,31 @@ async def query(request: QueryRequest):
             # it might not be in the fallback_sources if its score is too low compared to other hits.
             # We must also scan the full wiki_store manually just to find active corrections for the demo.
             all_files = wiki_store.list_files()
-            all_corrections = []
+            # Collect correction notes keyed by file path so the same file is
+            # never counted twice. Always read the FULL file: search_fallback
+            # truncates content to 1500 chars, which can hide the correction line.
+            correction_paths = []
             for f in all_files:
                 if "correction" in f.lower():
-                    content = wiki_store.read_file(f)
-                    if content:
-                        all_corrections.append({"title": f, "content": content})
-
-            corrections = [s for s in fallback_sources if "correction" in s["title"].lower() or "correction" in s["content"].lower()]
-            corrections.extend(all_corrections) # Ensure it's included
+                    correction_paths.append(f)
+            for s in fallback_sources:
+                if ("correction" in s["title"].lower() or "correction" in s["content"].lower()) and s["id"] not in correction_paths:
+                    correction_paths.append(s["id"])
 
             correction_text = ""
-            for c in corrections:
-                corr_match = re.search(r'Correction Text:\s*(.*)', c["content"], re.IGNORECASE)
+            seen_notes = set()
+            injected_corrections = []
+            for path in correction_paths:
+                content = wiki_store.read_file(path)
+                if not content:
+                    continue
+                injected_corrections.append({"id": path, "title": os.path.basename(path), "content": content})
+                corr_match = re.search(r'Correction Text:\s*(.*)', content, re.IGNORECASE)
                 if corr_match:
-                    correction_text += f"\nNote: {corr_match.group(1)}"
+                    note = corr_match.group(1).strip()
+                    if note and note not in seen_notes:
+                        seen_notes.add(note)
+                        correction_text += f"\nNote: {note}"
 
             # generic or specific context setup
             if "event" in request.query.lower():
@@ -108,12 +119,13 @@ async def query(request: QueryRequest):
 
             if correction_text:
                 answer_lines.append(correction_text)
-                # If we injected a correction from outside the top_k search results, append it to sources so the UI knows
-                if not any("correction" in s["title"].lower() for s in fallback_sources):
-                     # Add the first correction we found as a source
-                     for c in all_corrections:
-                         fallback_sources.append({"id": c["title"], "title": c["title"], "content": c["content"]})
-                         break
+                # If a correction came from outside the top_k search results,
+                # surface one as a source so the UI can cite it (no duplicates).
+                existing_ids = {s["id"] for s in fallback_sources}
+                for c in injected_corrections:
+                    if c["id"] not in existing_ids:
+                        fallback_sources.append(c)
+                        break
 
             source_titles = [s['title'] for s in fallback_sources]
             answer_lines.append("\nSources: " + ", ".join(source_titles))
@@ -136,9 +148,9 @@ async def query(request: QueryRequest):
 
 @app.post("/lint", response_model=LintResponse)
 async def lint(request: LintRequest):
-    # Determine the graph path based on wiki root or an env var
-    # For demo purposes, we look in the parent of wiki root
-    graph_path = os.path.join(os.path.dirname(WIKI_ROOT), "graph.json")
+    # Look for the graph in the parent of the wiki root. Resolve first so the
+    # path is stable regardless of trailing slashes or relative-vs-absolute root.
+    graph_path = str(Path(WIKI_ROOT).resolve().parent / "graph.json")
 
     issues = lint_engine.run_all_rules(graph_path)
 
@@ -154,8 +166,6 @@ def get_wiki_pages():
     files = wiki_store.list_files()
     pages = [{"id": f, "title": os.path.basename(f)} for f in files]
     return {"ok": True, "pages": pages}
-
-from pathlib import Path
 
 @app.get("/wiki/pages/{slug:path}")
 def get_wiki_page(slug: str):
