@@ -6,6 +6,16 @@ import {
 } from "./viewportCoords";
 import { GhostCursorIcon } from "./GhostCursorIcon";
 
+const FALLBACK_POSITION = { x: 50, y: 50 };
+
+function getStepPosition(step: any): { x: number; y: number } | null {
+  if (!step) return null;
+  const x = step.viewportX ?? step.x;
+  const y = step.viewportY ?? step.y;
+  if (x == null || y == null) return null;
+  return { x: clampPercent(x), y: clampPercent(y) };
+}
+
 interface GhostCursorProps {
   isVisible: boolean;
   mood?: string;
@@ -29,7 +39,8 @@ export const GhostCursor: React.FC<GhostCursorProps> = ({
   const [pointer, setPointer] = useState<{ x: number; y: number } | null>(
     null,
   );
-  const hasStep = Boolean(step);
+  const stepPos = getStepPosition(step);
+  const hasStep = stepPos !== null;
 
   useEffect(() => {
     const update = () => setDims(readViewportDims());
@@ -83,14 +94,11 @@ export const GhostCursor: React.FC<GhostCursorProps> = ({
 
   if (!isVisible) return null;
 
-  if (!hasStep && !(followPointer && pointer)) return null;
-
-  const percentX = clampPercent(
-    hasStep ? (step.viewportX ?? step.x) : pointer!.x,
-  );
-  const percentY = clampPercent(
-    hasStep ? (step.viewportY ?? step.y) : pointer!.y,
-  );
+  // Step target → exact position; otherwise the live pointer; screen center
+  // as a last resort so the ghost never silently disappears.
+  const pos = stepPos ?? pointer ?? FALLBACK_POSITION;
+  const percentX = clampPercent(pos.x);
+  const percentY = clampPercent(pos.y);
   const offsetX = hasStep ? 0 : POINTER_OFFSET.x;
   const offsetY = hasStep ? 0 : POINTER_OFFSET.y;
 

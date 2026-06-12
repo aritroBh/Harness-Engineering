@@ -1,9 +1,6 @@
 import React from "react";
 import type { BehavioralState, SpecMood } from "../../main/session/types";
-import {
-  usePerimeterRoam,
-  type PerimeterRoamResult,
-} from "./usePerimeterRoam";
+import { usePerimeterRoam, type PerimeterRoamResult } from "./usePerimeterRoam";
 import { ReasoningBubbles, type ReasoningLine } from "./ReasoningBubbles";
 
 interface SpecBuddyProps {

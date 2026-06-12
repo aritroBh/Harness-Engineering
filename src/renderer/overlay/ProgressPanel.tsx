@@ -214,9 +214,7 @@ export const ProgressPanel: React.FC<ProgressPanelProps> = ({
                 />
               )}
             </div>
-            {appName && (
-              <div className="specter-rail-app">{appName}</div>
-            )}
+            {appName && <div className="specter-rail-app">{appName}</div>}
           </section>
 
           {intent && (
@@ -285,10 +283,7 @@ export const ProgressPanel: React.FC<ProgressPanelProps> = ({
               )}
 
               {hasCompletedWalkthrough && replayState === "idle" && (
-                <Button
-                  className="specter-rail-replay-btn"
-                  onClick={onReplay}
-                >
+                <Button className="specter-rail-replay-btn" onClick={onReplay}>
                   Replay walkthrough
                 </Button>
               )}

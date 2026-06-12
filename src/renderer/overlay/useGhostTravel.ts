@@ -131,8 +131,8 @@ export function useGhostTravel(
     return () => {
       timers.forEach((id) => window.clearTimeout(id));
     };
-  // NOTE: options.start intentionally NOT in deps — it seeds lastPosRef once.
-  // Including it restarts mid-flight travel on every parent re-render.
+    // NOTE: options.start intentionally NOT in deps — it seeds lastPosRef once.
+    // Including it restarts mid-flight travel on every parent re-render.
   }, [loop, enabled, target?.x, target?.y, travelMs]);
 
   const percentX = clampPercent(

@@ -12,7 +12,10 @@ import { WalkthroughGuide } from "../overlay/WalkthroughGuide";
 import { SpecBuddy } from "../overlay/SpecBuddy";
 import { ModeToggle } from "../overlay/ModeToggle";
 import { SessionPanel } from "../overlay/SessionPanel";
-import { ProgressTracker, type AgentActionEvent } from "../overlay/ProgressTracker";
+import {
+  ProgressTracker,
+  type AgentActionEvent,
+} from "../overlay/ProgressTracker";
 import { SpecterWorkflowButton } from "../overlay/SpecterWorkflowButton";
 import {
   buildStepHistory,
@@ -372,13 +375,12 @@ const OverlayApp: React.FC = () => {
     const fetchMode = async () => {
       try {
         const startupMode = await api.getStartupMode();
-        // Demo presentation: voice + reasoning bubbles, no chat HUD.
+        // ghostwiki and ultra are both conversational (voice in + out);
+        // silent stays mute.
         if (startupMode === "ghostwiki") {
-          setMode("silent");
-          setDemoPresentationMode(true);
+          setMode("ghostwiki");
         } else if (startupMode === "ultra") {
           setMode("ultra");
-          setDemoPresentationMode(false);
         }
       } catch (err) {
         console.error("Failed to get startup mode", err);
@@ -468,7 +470,6 @@ const OverlayApp: React.FC = () => {
   );
   const [mirrorCorrectionCount, setMirrorCorrectionCount] = useState(0);
   const [pitchMode, setPitchMode] = useState(false);
-  const [demoPresentationMode, setDemoPresentationMode] = useState(true);
   const [contextReadActive, setContextReadActive] = useState(false);
   const [memorySearchActive, setMemorySearchActive] = useState(false);
   const [lastTTSProvider, setLastTTSProvider] = useState<
@@ -516,15 +517,10 @@ const OverlayApp: React.FC = () => {
   }, [specBuddyRoam.x, specBuddyRoam.y]);
 
   const modeRef = useRef(mode);
-  const demoPresentationRef = useRef(demoPresentationMode);
 
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
-
-  useEffect(() => {
-    demoPresentationRef.current = demoPresentationMode;
-  }, [demoPresentationMode]);
 
   const setInteractivity = (interactive: boolean) => {
     // Only go click-through if mouse is out AND input is not focused
@@ -542,6 +538,10 @@ const OverlayApp: React.FC = () => {
     }
   }, []);
 
+  // Voice conversation runs in ultra and ghostwiki; silent mode stays mute.
+  const isConversationalMode = () =>
+    modeRef.current === "ultra" || modeRef.current === "ghostwiki";
+
   // Hands-free listener. Tuned so real questions survive and ambient noise
   // doesn't: the utterance clock starts at first detected speech (not at
   // listen start), a thinking pause doesn't cut the user off, and transcripts
@@ -549,7 +549,7 @@ const OverlayApp: React.FC = () => {
   // Whisper invents phrases like "Thank you." on silence, which is what made
   // the ghost talk to nobody.
   const ghostAutoListen = async (): Promise<void> => {
-    if (modeRef.current !== "ultra" && !demoPresentationRef.current) {
+    if (!isConversationalMode()) {
       setUltraState("waitingForUser");
       return;
     }
@@ -658,9 +658,8 @@ const OverlayApp: React.FC = () => {
 
   const speakIfUltra = (text: string, moment: string) => {
     const currentMode = modeRef.current;
-    const demoMode = demoPresentationRef.current;
-    console.log("[MODE] current mode", { mode: currentMode, moment, demoMode });
-    if (currentMode === "ultra" || demoMode) {
+    console.log("[MODE] current mode", { mode: currentMode, moment });
+    if (currentMode === "ultra" || currentMode === "ghostwiki") {
       setUltraState("speaking");
       const timeout = setTimeout(() => {
         console.warn("[TTS] speak timeout");
@@ -860,23 +859,6 @@ const OverlayApp: React.FC = () => {
     scheduleLiveGhostDismiss();
   };
 
-  // Demo-mode ghost walkthrough: replays the bundled demo workflow steps so
-  // the ghost cursor visibly travels and points at each target. Passing an
-  // empty nodeId makes the main process pick the latest session with steps.
-  const startDemoWalkthrough = async () => {
-    setErrorMessage("");
-    setReplayMode("walkthrough");
-    setReplayState("running");
-    try {
-      await api.walkthrough("");
-    } catch (error) {
-      console.error("[Overlay] demo walkthrough failed:", error);
-      setErrorMessage(messageFromError(error));
-      setReplayState("idle");
-      setReplayMode(null);
-    }
-  };
-
   // Explicit "do it on screen" phrasing skips the chat round-trip and goes
   // straight to target detection; everything else is a conversation turn and
   // Claude decides whether to escalate to a walkthrough.
@@ -895,10 +877,7 @@ const OverlayApp: React.FC = () => {
       await runNoteHtmlAgent(requestedText);
       return;
     }
-    if (
-      WALKTHROUGH_FAST_PATH.test(requestedText) &&
-      !demoPresentationRef.current
-    ) {
+    if (WALKTHROUGH_FAST_PATH.test(requestedText)) {
       await startRealAppTest(requestedText);
       return;
     }
@@ -972,7 +951,7 @@ const OverlayApp: React.FC = () => {
         { role: "assistant", content: reply },
       ]);
 
-      if (result.shouldSpeak || demoPresentationMode) {
+      if (result.shouldSpeak) {
         console.log("[TTS] speak called");
         speakIfUltra(reply, "tutor reply");
       } else {
@@ -984,10 +963,7 @@ const OverlayApp: React.FC = () => {
         result.shouldStartWalkthrough ||
         HOW_TO_PATTERN.test(text);
       if (wantsWalkthrough && !currentStep && replayState === "idle") {
-        if (demoPresentationRef.current) {
-          // Demo mode: replay the saved workflow so the ghost visibly moves.
-          void startDemoWalkthrough();
-        } else if (result.shouldStartWalkthrough && lastNodeId) {
+        if (result.shouldStartWalkthrough && lastNodeId) {
           void replaySavedWorkflow("walkthrough");
         } else if (
           result.intent === "start_walkthrough" ||
@@ -1148,7 +1124,7 @@ const OverlayApp: React.FC = () => {
       });
       setRailExpanded(true);
       setSpecMood("celebrating");
-      if (modeRef.current === "ultra") {
+      if (isConversationalMode()) {
         setUltraState("idle");
       }
     });
@@ -1160,7 +1136,7 @@ const OverlayApp: React.FC = () => {
       setManualConfirmMessage("");
       setSessionComplete(false);
       setSpecMood("idle");
-      if (modeRef.current === "ultra") {
+      if (isConversationalMode()) {
         setUltraState("idle");
       }
     });
@@ -1334,10 +1310,12 @@ const OverlayApp: React.FC = () => {
         if (prediction) {
           setUltraSessionHistory((prev) => {
             if (prev.length > 0) return prev;
-            return [{ role: "assistant", content: prediction, proactive: true }];
+            return [
+              { role: "assistant", content: prediction, proactive: true },
+            ];
           });
         }
-        if (modeRef.current === "ultra" || demoPresentationRef.current) {
+        if (isConversationalMode()) {
           void ghostAutoListen();
         } else {
           setUltraState("waitingForUser");
@@ -1566,7 +1544,7 @@ const OverlayApp: React.FC = () => {
       setIsLoading(false);
       setSpecMood("thinking");
 
-      if (modeRef.current === "ultra") {
+      if (isConversationalMode()) {
         speakIfUltra("Follow the ghost cursor.", "step start");
         setUltraState("guiding");
       }
@@ -1593,7 +1571,7 @@ const OverlayApp: React.FC = () => {
       });
       setSpecMood("flow");
 
-      if (modeRef.current === "ultra") {
+      if (isConversationalMode()) {
         speakIfUltra("Nice, you're close. Click when ready.", "target reached");
       }
     });
@@ -2749,9 +2727,9 @@ const OverlayApp: React.FC = () => {
                   enabled={isVisible || isReplayRunning || isLoading}
                   roam={specBuddyRoam}
                   checkpointLabel={activeCheckpoint?.label}
-                  compact={!showDebugTools && !demoPresentationMode}
+                  compact={!showDebugTools}
                   pitchMode={pitchMode}
-                  reasoningLines={demoPresentationMode ? reasoningLines : []}
+                  reasoningLines={reasoningLines}
                 />
               )}
 
@@ -2980,7 +2958,7 @@ const OverlayApp: React.FC = () => {
               </div>
             )}
 
-            {isLoading && !demoPresentationMode && (
+            {isLoading && (
               <div
                 style={{
                   position: "fixed",
@@ -3349,7 +3327,7 @@ const OverlayApp: React.FC = () => {
                 </div>
               )}
 
-              {!showWorkflowCard && !demoPresentationMode && (
+              {!showWorkflowCard && (
                 <div
                   style={{
                     display: "flex",

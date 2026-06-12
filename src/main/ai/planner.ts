@@ -826,7 +826,12 @@ export async function summarizeSession(
   corrections: number,
   prior: SkillProfile | null,
 ): Promise<SkillProfile> {
-  const fallback = mergeProfileHeuristic(goal, completedSays, corrections, prior);
+  const fallback = mergeProfileHeuristic(
+    goal,
+    completedSays,
+    corrections,
+    prior,
+  );
   const client = createAnthropicClient();
   if (!client) return fallback;
 
@@ -994,7 +999,11 @@ export async function planNextStep(
       .join("\n");
 
     safeLog("[PLANNER] Single-step raw:", rawText);
-    return resolveStep(normalizePlannerOutput(extractJson(rawText)), tree, stepId);
+    return resolveStep(
+      normalizePlannerOutput(extractJson(rawText)),
+      tree,
+      stepId,
+    );
   } catch (error: any) {
     safeError(
       "[AI_BACKEND] Single-step planner unavailable; using fallback",

@@ -3,7 +3,11 @@ import { existsSync } from "fs";
 import { join } from "path";
 import { safeLog, safeError } from "./logger";
 
-export const DEFAULT_WIKI_ROOT = "./demo-workflows/event-recap/wiki";
+// User's real GhostWiki directory under Application Support (created on first run)
+export const DEFAULT_WIKI_ROOT = (() => {
+  const home = process.env.HOME || process.env.USERPROFILE || ".";
+  return join(home, "Library/Application Support/Specter/GhostWiki");
+})();
 
 export function memoryServicePort(): string {
   return process.env.MEMORY_SERVICE_PORT || "8765";
@@ -21,7 +25,9 @@ export async function postToMemoryService<T extends Record<string, unknown>>(
   });
   if (!res.ok) {
     const detail = (await res.text()).slice(0, 300);
-    throw new Error(`Memory service ${path} failed: HTTP ${res.status} ${detail}`);
+    throw new Error(
+      `Memory service ${path} failed: HTTP ${res.status} ${detail}`,
+    );
   }
   return (await res.json()) as T;
 }
@@ -57,7 +63,13 @@ export async function startMemorySidecar() {
     }
     safeLog("[GhostWiki] Sidecar died during reuse check, spawning fresh");
   }
-  const venvPython = join(process.cwd(), "memory_service", ".venv", "bin", "python");
+  const venvPython = join(
+    process.cwd(),
+    "memory_service",
+    ".venv",
+    "bin",
+    "python",
+  );
   const pythonExec = process.env.VIRTUAL_ENV
     ? join(process.env.VIRTUAL_ENV, "bin", "python")
     : existsSync(venvPython)
@@ -113,7 +125,10 @@ export async function waitForSidecarReady(
 ): Promise<boolean> {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     if (await isSidecarHealthy(port)) {
-      safeLog("[GhostWiki] Memory sidecar ready", { port, attempt: attempt + 1 });
+      safeLog("[GhostWiki] Memory sidecar ready", {
+        port,
+        attempt: attempt + 1,
+      });
       return true;
     }
     await new Promise((resolve) => setTimeout(resolve, 200));

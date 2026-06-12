@@ -301,7 +301,9 @@ async function main() {
     readFile("src/renderer/overlay/ProgressTracker.tsx").includes(
       "specter-rail-steps-list--full",
     ) &&
-      readFile("src/renderer/overlay/stepHistory.ts").includes("sessionComplete"),
+      readFile("src/renderer/overlay/stepHistory.ts").includes(
+        "sessionComplete",
+      ),
     "ProgressTracker shows full step list with persistent session state",
   );
   check(
@@ -326,7 +328,7 @@ async function main() {
   );
   check(
     readFile("src/renderer/overlay/InputBar.tsx").includes(
-      '@openuidev/react-ui',
+      "@openuidev/react-ui",
     ) &&
       readFile("src/renderer/overlay/InputBar.tsx").includes("<Input") &&
       readFile("src/renderer/overlay/InputBar.tsx").includes("<IconButton"),
@@ -1679,8 +1681,8 @@ async function main() {
     "index.ts registers behavior:getState IPC",
   );
   check(
-    /ipcMain\.handle\(\s*['"]behavior:seedDemo['"]/.test(mainIndex),
-    "index.ts registers behavior:seedDemo IPC",
+    !/ipcMain\.handle\(\s*['"]behavior:seedDemo['"]/.test(mainIndex),
+    "index.ts does NOT register behavior:seedDemo IPC (demo removed)",
   );
   check(
     /ipcMain\.handle\(\s*['"]behavior:feedback['"]/.test(mainIndex),
@@ -1717,9 +1719,9 @@ async function main() {
     "mirror:run requires AutomationGate before real mouse automation",
   );
   check(
-    mainIndex.includes("Synthetic demo checkpoints are a dev-only fallback") &&
-      mainIndex.includes("SPECTER_ENABLE_DEV_FALLBACK"),
-    "index.ts gates synthetic demo data behind dev fallback",
+    !mainIndex.includes("Synthetic demo checkpoints are a dev-only fallback") &&
+      !mainIndex.includes("SPECTER_ENABLE_DEV_FALLBACK"),
+    "index.ts no longer gates synthetic demo data (demo removed)",
   );
   check(
     !/ipcMain\.handle\('mirror:run'[\s\S]*?seedDemoCheckpoints/.test(mainIndex),
@@ -1781,9 +1783,8 @@ async function main() {
   }
   check(overlayAppBody.includes("<SpecBuddy"), "OverlayApp renders SpecBuddy");
   check(
-    overlayAppBody.includes("DEV Synthetic Data") &&
-      overlayAppBody.includes("Mirror Mode"),
-    "OverlayApp exposes Mirror Mode and labeled dev fallback controls",
+    overlayAppBody.includes("Mirror Mode"),
+    "OverlayApp exposes Mirror Mode controls",
   );
   check(
     overlayAppBody.includes("behaviorBlendCheckpoints") &&

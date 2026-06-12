@@ -15,11 +15,7 @@
 import { planNextStep, summarizeSession } from "../ai/planner";
 import { axEventWatcher } from "../context/axEventWatcher";
 import { safeLog, safeWarn } from "../logger";
-import {
-  getProfile,
-  profileSummary,
-  setProfile,
-} from "./skillProfileStore";
+import { getProfile, profileSummary, setProfile } from "./skillProfileStore";
 import {
   MOCK_TREE,
   type BrainEvent,

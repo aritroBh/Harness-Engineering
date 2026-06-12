@@ -4,7 +4,10 @@
  * Exercises resolveStep (pure) and planNextStep's fallback path (no API key needed).
  */
 import { planNextStep, resolveStep } from "../src/main/ai/planner";
-import type { SerializedTree, PlannerOutput } from "../src/shared/partA-contract";
+import type {
+  SerializedTree,
+  PlannerOutput,
+} from "../src/shared/partA-contract";
 
 const tree: SerializedTree = {
   app: "Gmail (browser: Chrome)",
@@ -13,8 +16,20 @@ const tree: SerializedTree = {
   focusedId: "e42",
   elements: [
     { id: "e3", role: "button", label: "Compose", bbox: [88, 120, 160, 150] },
-    { id: "e17", role: "button", label: "Attach files", bbox: [612, 884, 648, 920] },
-    { id: "e42", role: "textfield", label: "Search mail", value: "", bbox: [400, 60, 700, 90], focused: true },
+    {
+      id: "e17",
+      role: "button",
+      label: "Attach files",
+      bbox: [612, 884, 648, 920],
+    },
+    {
+      id: "e42",
+      role: "textfield",
+      label: "Search mail",
+      value: "",
+      bbox: [400, 60, 700, 90],
+      focused: true,
+    },
   ],
 };
 
@@ -43,15 +58,32 @@ async function main(): Promise<void> {
 
   console.log("resolveStep — goal complete:");
   const done = resolveStep(
-    { say: "All done!", element_id: null, action_type: "read", goal_complete: true },
+    {
+      say: "All done!",
+      element_id: null,
+      action_type: "read",
+      goal_complete: true,
+    },
     tree,
     6,
   );
-  assert(done.goalComplete === true && done.status === "goal_done", "goal_done status");
+  assert(
+    done.goalComplete === true && done.status === "goal_done",
+    "goal_done status",
+  );
 
   console.log("planNextStep — fallback path (no API key):");
-  const fb = await planNextStep("send an email with an attachment", tree, [], "", 1);
-  assert(typeof fb.say === "string" && fb.say.length > 0, "produces a say string");
+  const fb = await planNextStep(
+    "send an email with an attachment",
+    tree,
+    [],
+    "",
+    1,
+  );
+  assert(
+    typeof fb.say === "string" && fb.say.length > 0,
+    "produces a say string",
+  );
   assert(fb.stepId === 1, "carries stepId");
 
   console.log("\nALL PASS");

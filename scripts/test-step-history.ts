@@ -31,7 +31,9 @@ check(
     total: 3,
     currentIndex: 2,
     instructions,
-  }).map((s) => s.status).join(",") === "completed,completed,current",
+  })
+    .map((s) => s.status)
+    .join(",") === "completed,completed,current",
 );
 
 check(
@@ -59,7 +61,13 @@ check(
   buildStepHistory({
     total: 5,
     currentIndex: 0,
-    instructions: new Map([[0, "A"], [1, "B"], [2, "C"], [3, "D"], [4, "E"]]),
+    instructions: new Map([
+      [0, "A"],
+      [1, "B"],
+      [2, "C"],
+      [3, "D"],
+      [4, "E"],
+    ]),
     completedIndices: new Set([0, 1, 2, 3, 4]),
     sessionComplete: true,
   }).length === 5,
@@ -99,9 +107,7 @@ const summary = stepSummary(
 );
 check(
   "summary counts statuses",
-  summary.completed === 2 &&
-    summary.current === 1 &&
-    summary.upcoming === 1,
+  summary.completed === 2 && summary.current === 1 && summary.upcoming === 1,
 );
 
 console.log("---");

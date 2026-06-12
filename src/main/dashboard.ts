@@ -98,15 +98,6 @@ function graphSources(): { name: string; path: string; demo: boolean }[] {
       }
     }
   }
-  // Demo workflow graph ships with the repo so the Progress tab has content
-  // before the user has recorded their own sessions.
-  const demoGraph = resolve(
-    process.cwd(),
-    "demo-workflows/event-recap/graph.json",
-  );
-  if (existsSync(demoGraph)) {
-    sources.push({ name: "Luma.json", path: demoGraph, demo: true });
-  }
   return sources;
 }
 

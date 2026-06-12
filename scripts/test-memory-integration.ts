@@ -25,7 +25,9 @@ function check(label: string, condition: boolean) {
 
 async function healthOk(): Promise<boolean> {
   try {
-    const res = await fetch(`${BASE}/health`, { signal: AbortSignal.timeout(1500) });
+    const res = await fetch(`${BASE}/health`, {
+      signal: AbortSignal.timeout(1500),
+    });
     return res.ok;
   } catch {
     return false;
@@ -41,14 +43,19 @@ async function waitForHealth(maxMs = 8000): Promise<void> {
   throw new Error(`Memory service not healthy on port ${PORT}`);
 }
 
-async function postJson<T>(path: string, body: Record<string, unknown>): Promise<T> {
+async function postJson<T>(
+  path: string,
+  body: Record<string, unknown>,
+): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    throw new Error(`${path} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    throw new Error(
+      `${path} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`,
+    );
   }
   return (await res.json()) as T;
 }
@@ -57,15 +64,22 @@ async function main() {
   console.log("== Memory integration test ==");
 
   if (!(await healthOk())) {
-    const python =
-      process.env.VIRTUAL_ENV
-        ? join(process.env.VIRTUAL_ENV, "bin", "python")
-        : existsSync("memory_service/.venv/bin/python")
-          ? "memory_service/.venv/bin/python"
-          : "python3";
+    const python = process.env.VIRTUAL_ENV
+      ? join(process.env.VIRTUAL_ENV, "bin", "python")
+      : existsSync("memory_service/.venv/bin/python")
+        ? "memory_service/.venv/bin/python"
+        : "python3";
     child = spawn(
       python,
-      ["-m", "uvicorn", "memory_service.app:app", "--host", "127.0.0.1", "--port", PORT],
+      [
+        "-m",
+        "uvicorn",
+        "memory_service.app:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        PORT,
+      ],
       {
         cwd: process.cwd(),
         env: {
@@ -86,16 +100,22 @@ async function main() {
   check("wiki_root aligned", health.wiki_root === WIKI_ROOT);
   check("fallback mode", health.cognee_enabled === false);
 
-  const ingest = await postJson<{ ok: boolean; sources_ingested: number }>("/ingest", {
-    files: [],
-  });
+  const ingest = await postJson<{ ok: boolean; sources_ingested: number }>(
+    "/ingest",
+    {
+      files: [],
+    },
+  );
   check("ingest ok", ingest.ok === true);
   check("ingest found demo pages", ingest.sources_ingested >= 4);
 
-  const query = await postJson<{ ok: boolean; answer: string; sources: unknown[] }>(
-    "/query",
-    { query: "How do I create a calendar event from this event page?" },
-  );
+  const query = await postJson<{
+    ok: boolean;
+    answer: string;
+    sources: unknown[];
+  }>("/query", {
+    query: "How do I create a calendar event from this event page?",
+  });
   check("query ok", query.ok === true);
   check("query has sources", query.sources.length > 0);
   check(
@@ -109,7 +129,10 @@ async function main() {
   check("lint finds issues", lint.issues.length > 0);
 
   const pages = await (await fetch(`${BASE}/wiki/pages`)).json();
-  check("wiki pages listed", Array.isArray(pages.pages) && pages.pages.length >= 4);
+  check(
+    "wiki pages listed",
+    Array.isArray(pages.pages) && pages.pages.length >= 4,
+  );
 
   // Adversarial: empty query body should 422
   const badRes = await fetch(`${BASE}/query`, {
@@ -119,7 +142,9 @@ async function main() {
   });
   check("malformed query rejected", badRes.status === 422);
 
-  console.log(`\n${failed === 0 ? "All" : failed} memory integration check(s) ${failed === 0 ? "passed" : "failed"}`);
+  console.log(
+    `\n${failed === 0 ? "All" : failed} memory integration check(s) ${failed === 0 ? "passed" : "failed"}`,
+  );
   if (startedChild && child) {
     child.kill();
     await new Promise((r) => setTimeout(r, 500));

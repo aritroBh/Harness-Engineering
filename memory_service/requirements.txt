@@ -6,3 +6,7 @@ pytest-asyncio
 httpx
 pydantic
 python-dotenv
+# Ross retrieval layer
+clickhouse-connect
+# optional: local zero-key embeddings (EMBED_PROVIDER=local)
+# fastembed
