@@ -7,6 +7,15 @@ class IngestRequest(BaseModel):
 class QueryRequest(BaseModel):
     query: str
 
+class InteractionDoc(BaseModel):
+    content: str
+    source: Optional[str] = None
+    site_id: Optional[str] = None
+
+class LearnRequest(BaseModel):
+    # Interactions/observations pushed by Specter for Ross to learn.
+    documents: List[InteractionDoc] = Field(default_factory=list)
+
 class LintRequest(BaseModel):
     pass
 

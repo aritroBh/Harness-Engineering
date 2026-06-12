@@ -1,16 +1,22 @@
 import os
 import logging
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # load .env so CLICKHOUSE_* / EMBED_* are available when served
+except Exception:
+    pass
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
-from .schemas import IngestRequest, IngestResponse, QueryRequest, QueryResponse, LintRequest, LintResponse
+from .schemas import (IngestRequest, IngestResponse, QueryRequest, QueryResponse,
+                      LintRequest, LintResponse, LearnRequest)
 from .cognee_adapter import CogneeAdapter
 from .wiki_store import WikiStore
 from .lint_engine import LintEngine
 from .embedder import Embedder
 from .clickhouse_store import ClickHouseRetriever
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger("ross")
 
 app = FastAPI(title="GhostWiki Memory Service")
 
@@ -37,6 +43,24 @@ def health():
         "embed_provider": embedder.provider if embedder.enabled else None,
     }
 
+@app.get("/stats")
+def stats():
+    """Current knowledge size in Ross (watch it grow as you ingest)."""
+    return ross.stats()
+
+@app.post("/learn", response_model=IngestResponse)
+def learn(request: LearnRequest):
+    """Specter -> Ross write path: learn interactions/observations directly
+    (no files). Each document is chunked, embedded and stored in ClickHouse."""
+    if not ross.enabled:
+        raise HTTPException(status_code=503, detail="Ross (ClickHouse) is not enabled")
+    docs = [d.model_dump() for d in request.documents]
+    if not docs:
+        return IngestResponse(ok=True, mode="clickhouse", warnings=["no documents"], sources_ingested=0)
+    n, warnings = ross.ingest_documents(docs)
+    logger.info("🧠 LEARNED %d chunks from %d interaction(s) pushed by Specter", n, len(docs))
+    return IngestResponse(ok=True, mode="clickhouse", warnings=warnings, sources_ingested=n)
+
 @app.post("/ingest", response_model=IngestResponse)
 async def ingest(request: IngestRequest):
     files_to_ingest = request.files
@@ -51,6 +75,7 @@ async def ingest(request: IngestRequest):
     if ross.enabled:
         try:
             n, warnings = ross.ingest_files(files_to_ingest, wiki_store.read_file)
+            logger.info("🧠 LEARNED %d chunks from %d doc(s) -> ClickHouse", n, len(files_to_ingest))
             return IngestResponse(ok=True, mode="clickhouse", warnings=warnings, sources_ingested=n)
         except Exception as e:
             logger.error("Ross ingest failed: %s", e)
@@ -70,6 +95,12 @@ async def query(request: QueryRequest):
     if ross.enabled:
         result = ross.retrieve(request.query)
         if result:
+            logger.info(
+                "🔍 QUERY %r -> %d seeds | site=%s protocol=%s | %d journey steps, %d graph nbrs",
+                request.query, len(result["seeds"]), result.get("site_id"),
+                result.get("protocol"), len(result.get("journey", [])),
+                len(result.get("graph_context", [])),
+            )
             return QueryResponse(
                 ok=True,
                 mode="clickhouse",

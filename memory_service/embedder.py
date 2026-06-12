@@ -11,6 +11,7 @@ returning {"data": [{"embedding": [...], "index": n}, ...]}, so a single
 httpx client handles all three — only base_url / model / auth differ.
 """
 import os
+import time
 import logging
 from typing import List
 
@@ -92,10 +93,24 @@ class Embedder:
             ),
         }
         payload = {"model": self.model, "input": texts}
+        # The TrueFoundry gateway occasionally returns transient 404/429/5xx
+        # (cold-start / routing). Retry with small backoff for robustness.
+        attempts = int(os.getenv("EMBED_RETRIES", "4"))
+        retryable = {404, 408, 409, 425, 429, 500, 502, 503, 504}
+        last = None
+        data = None
         with httpx.Client(timeout=60) as client:
-            resp = client.post(url, headers=headers, json=payload)
-            resp.raise_for_status()
-            data = resp.json()["data"]
+            for i in range(attempts):
+                resp = client.post(url, headers=headers, json=payload)
+                if resp.status_code == 200:
+                    data = resp.json()["data"]
+                    break
+                last = f"{resp.status_code} {resp.text[:160]}"
+                if resp.status_code not in retryable:
+                    break
+                time.sleep(0.6 * (i + 1))
+        if data is None:
+            raise RuntimeError(f"Embeddings failed after retries: {last}")
         # Preserve input order
         data.sort(key=lambda d: d.get("index", 0))
         return [d["embedding"] for d in data]

@@ -110,18 +110,29 @@ class ClickHouseRetriever:
     # ---------------------------------------------------------------- ingest
     def ingest_files(self, files: List[str], read_file) -> Tuple[int, List[str]]:
         """Chunk -> embed -> load into ClickHouse. `read_file(path)->str|None`."""
+        docs = [{"source": p, "content": read_file(p)} for p in files]
+        return self.ingest_documents(docs)
+
+    def ingest_documents(self, docs: List[Dict]) -> Tuple[int, List[str]]:
+        """Learn raw documents/interactions pushed by Specter.
+
+        Each doc: {"content": str, "source"?: str, "site_id"?: str}. This is the
+        write path for the Specter -> Ross learning loop (no files needed).
+        """
         self.init_schema()
         warnings: List[str] = []
         all_chunks: List[Chunk] = []
         all_nodes: List[Node] = []
         all_edges: List[Edge] = []
 
-        for path in files:
-            content = read_file(path)
+        for d in docs:
+            content = d.get("content")
+            source = d.get("source") or d.get("title") or "interaction.md"
             if not content:
-                warnings.append(f"skip empty: {path}")
+                warnings.append(f"skip empty: {source}")
                 continue
-            res = chunk_site_md(path, content, known_sites=self.known_sites)
+            res = chunk_site_md(source, content, site_id=d.get("site_id"),
+                                known_sites=self.known_sites)
             all_chunks.extend(res["chunks"])
             all_nodes.extend(res["nodes"])
             all_edges.extend(res["edges"])
@@ -288,6 +299,33 @@ class ClickHouseRetriever:
         except Exception as e:
             logger.error("ClickHouse retrieve failed: %s", e)
             return None
+
+    def stats(self) -> Dict:
+        """Knowledge-size snapshot — useful to watch the memory grow as it learns."""
+        if not self.enabled:
+            return {"enabled": False}
+
+        def count(table: str) -> int:
+            try:
+                return self.client.query(f"SELECT count() FROM {table}").result_rows[0][0]
+            except Exception:
+                return 0
+
+        by_site = []
+        try:
+            rows = self.client.query(
+                "SELECT site_id, count() FROM doc_chunks GROUP BY site_id ORDER BY count() DESC"
+            ).result_rows
+            by_site = [{"site_id": r[0], "chunks": r[1]} for r in rows]
+        except Exception:
+            pass
+        return {
+            "enabled": True,
+            "chunks": count("doc_chunks"),
+            "nodes": count("kg_nodes"),
+            "edges": count("kg_edges"),
+            "by_site": by_site,
+        }
 
     @staticmethod
     def _synthesize(query: str, seeds: List[Dict], journey: List[Dict]) -> str:
