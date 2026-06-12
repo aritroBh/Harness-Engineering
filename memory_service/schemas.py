@@ -12,7 +12,7 @@ class LintRequest(BaseModel):
 
 class BaseResponse(BaseModel):
     ok: bool
-    mode: str = Field(description="cognee|fallback")
+    mode: str = Field(description="clickhouse|cognee|fallback")
     warnings: List[str] = Field(default_factory=list)
 
 class IngestResponse(BaseResponse):
@@ -24,9 +24,28 @@ class SourceItem(BaseModel):
     content: str
     score: float = 1.0
 
+class JourneyStep(BaseModel):
+    step: int
+    heading: str
+    detail: str
+    chunk_id: Optional[str] = None
+
+class GraphContextItem(BaseModel):
+    heading: str
+    content: str
+    relation: str
+    site_id: Optional[str] = None
+    protocol: Optional[str] = None
+    chunk_id: Optional[str] = None
+
 class QueryResponse(BaseResponse):
     answer: str
     sources: List[SourceItem] = Field(default_factory=list)
+    # Structured enablement context for Harvey/Specter (Retr KG output)
+    site_id: Optional[str] = None
+    protocol: Optional[str] = None
+    journey: List[JourneyStep] = Field(default_factory=list)
+    graph_context: List[GraphContextItem] = Field(default_factory=list)
 
 class LintIssue(BaseModel):
     rule: str
