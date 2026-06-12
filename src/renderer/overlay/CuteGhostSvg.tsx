@@ -61,8 +61,18 @@ export const CuteGhostSvg: React.FC<CuteGhostSvgProps> = ({
       return (
         <>
           {blush}
-          <circle className="cute-ghost__eye wide" cx="13.5" cy="17.5" r="3.8" />
-          <circle className="cute-ghost__eye wide" cx="22.5" cy="17.5" r="3.8" />
+          <circle
+            className="cute-ghost__eye wide"
+            cx="13.5"
+            cy="17.5"
+            r="3.8"
+          />
+          <circle
+            className="cute-ghost__eye wide"
+            cx="22.5"
+            cy="17.5"
+            r="3.8"
+          />
           <circle className="cute-ghost__shine" cx="14.8" cy="16.2" r="1.3" />
           <circle className="cute-ghost__shine" cx="23.8" cy="16.2" r="1.3" />
           <path
@@ -131,7 +141,10 @@ export const CuteGhostSvg: React.FC<CuteGhostSvgProps> = ({
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="var(--openui-text-white)" />
           <stop offset="72%" stopColor="var(--openui-info-background)" />
-          <stop offset="100%" stopColor="color-mix(in oklch, var(--openui-border-info-emphasis) 22%, var(--openui-text-white))" />
+          <stop
+            offset="100%"
+            stopColor="color-mix(in oklch, var(--openui-border-info-emphasis) 22%, var(--openui-text-white))"
+          />
         </linearGradient>
         <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2.2" result="blur" />

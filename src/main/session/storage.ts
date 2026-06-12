@@ -262,17 +262,7 @@ export function normalizeGraph(graph: any, appName: string): LearningGraph {
   return normalized;
 }
 
-import { getDemoWorkflow } from "./demoWorkflow";
-
 export function loadGraph(appName = DEFAULT_APP_NAME): LearningGraph {
-  const specterMode = process.env.SPECTER_MODE || "ghostwiki";
-  if (specterMode === "ghostwiki") {
-    const demo = getDemoWorkflow();
-    if (demo) {
-      return normalizeGraph(demo as any, appName);
-    }
-  }
-
   const filePath = graphPath(appName);
   if (!existsSync(filePath)) {
     return createDefaultGraph(appName);

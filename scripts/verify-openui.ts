@@ -61,8 +61,7 @@ for (const file of overlayFiles) {
   const src = read(file);
   const usesOpenUI =
     src.includes("@openuidev/react-ui") ||
-    (file.endsWith("CuteGhostSvg.tsx") &&
-      src.includes("--openui-text-white"));
+    (file.endsWith("CuteGhostSvg.tsx") && src.includes("--openui-text-white"));
   check(`${file} uses OpenUI`, usesOpenUI);
 }
 
@@ -87,7 +86,11 @@ check(
 
 const css = read("src/renderer/src/assets/overlay.css");
 const tokenCount = (css.match(/--openui-/g) || []).length;
-check("overlay.css uses OpenUI tokens", tokenCount >= 40, `${tokenCount} token refs`);
+check(
+  "overlay.css uses OpenUI tokens",
+  tokenCount >= 40,
+  `${tokenCount} token refs`,
+);
 
 check(
   "ProgressTracker wired in OverlayApp",
@@ -118,10 +121,14 @@ if (exists(outDir)) {
     .readdirSync(outDir)
     .filter((f) => f.startsWith("overlay-") && f.endsWith(".js"));
   if (bundles.length > 0) {
-    const bundle = read(path.join("out/renderer/assets", bundles[bundles.length - 1]));
+    const bundle = read(
+      path.join("out/renderer/assets", bundles[bundles.length - 1]),
+    );
     check(
       "production overlay bundle includes OpenUI runtime",
-      bundle.includes("openui") || bundle.includes("OpenUI") || bundle.length > 1_000_000,
+      bundle.includes("openui") ||
+        bundle.includes("OpenUI") ||
+        bundle.length > 1_000_000,
       `${bundles[bundles.length - 1]} (${Math.round(bundle.length / 1024)} KB)`,
     );
   }
@@ -129,7 +136,9 @@ if (exists(outDir)) {
     .readdirSync(outDir)
     .filter((f) => f.startsWith("overlay-") && f.endsWith(".css"));
   if (cssFiles.length > 0) {
-    const builtCss = read(path.join("out/renderer/assets", cssFiles[cssFiles.length - 1]));
+    const builtCss = read(
+      path.join("out/renderer/assets", cssFiles[cssFiles.length - 1]),
+    );
     check(
       "built overlay CSS includes OpenUI layer",
       builtCss.includes("openui") || builtCss.includes("--openui-"),

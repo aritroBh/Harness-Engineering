@@ -1082,71 +1082,71 @@
       "id": "file::ghostwikipanel",
       "label": "GhostWikiPanel.tsx",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:1"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:1"
     },
     {
       "id": "GhostWikiPanel::addlog",
       "label": "addLog",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:35"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:35"
     },
     {
       "id": "GhostWikiPanel::updatelastlog",
       "label": "updateLastLog",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:52"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:52"
     },
     {
       "id": "GhostWikiPanel::refreshstatus",
       "label": "refreshStatus",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:66"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:66"
     },
     {
       "id": "GhostWikiPanel::handlequery",
       "label": "handleQuery",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:93"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:93"
     },
     {
       "id": "GhostWikiPanel::handlelint",
       "label": "handleLint",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:111"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:111"
     },
     {
       "id": "GhostWikiPanel::handlecompilewiki",
       "label": "handleCompileWiki",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:135"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:135"
     },
     {
       "id": "GhostWikiPanel::submitfeedback",
       "label": "submitFeedback",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:150"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:150"
     },
     {
       "id": "GhostWikiPanel::delay",
       "label": "delay",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:181"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:181"
     },
     {
       "id": "GhostWikiPanel::runwinningdemo",
       "label": "runWinningDemo",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/renderer/overlay/GhostWikiPanel.tsx:184"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/GhostWikiPanel.tsx:184"
     },
     {
       "id": "main::demoapp",
@@ -3924,148 +3924,148 @@
       "id": "file::storage",
       "label": "storage.ts",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:1"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:1"
     },
     {
       "id": "storage::createdefaultgraph",
       "label": "createDefaultGraph",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:16"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:16"
     },
     {
       "id": "storage::graphpath",
       "label": "graphPath",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:31"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:31"
     },
     {
       "id": "storage::isrecord",
       "label": "isRecord",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:42"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:42"
     },
     {
       "id": "storage::stringvalue",
       "label": "stringValue",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:46"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:46"
     },
     {
       "id": "storage::nonnegativenumber",
       "label": "nonNegativeNumber",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:50"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:50"
     },
     {
       "id": "storage::percentnumber",
       "label": "percentNumber",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:56"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:56"
     },
     {
       "id": "storage::nonnegativeinteger",
       "label": "nonNegativeInteger",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:60"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:60"
     },
     {
       "id": "storage::stringarray",
       "label": "stringArray",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:64"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:64"
     },
     {
       "id": "storage::normalizeaction",
       "label": "normalizeAction",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:70"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:70"
     },
     {
       "id": "storage::normalizesourceframe",
       "label": "normalizeSourceFrame",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:76"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:76"
     },
     {
       "id": "storage::normalizenode",
       "label": "normalizeNode",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:82"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:82"
     },
     {
       "id": "storage::normalizeedge",
       "label": "normalizeEdge",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:96"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:96"
     },
     {
       "id": "storage::normalizebranch",
       "label": "normalizeBranch",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:107"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:107"
     },
     {
       "id": "storage::normalizestep",
       "label": "normalizeStep",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:123"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:123"
     },
     {
       "id": "storage::normalizesession",
       "label": "normalizeSession",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:164"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:164"
     },
     {
       "id": "storage::legacybanditstatekey",
       "label": "legacyBanditStateKey",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:176"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:176"
     },
     {
       "id": "storage::persistedbanditstate",
       "label": "persistedBanditState",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:180"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:180"
     },
     {
       "id": "storage::normalizegraph",
       "label": "normalizeGraph",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:186"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:186"
     },
     {
       "id": "storage::loadgraph",
       "label": "loadGraph",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:267"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:265"
     },
     {
       "id": "storage::savegraph",
       "label": "saveGraph",
       "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts",
-      "sourceLocation": "/Users/aritro/Downloads/Cursor x a16z/Hackathon-Building-your-own-Agent-LLM-Wiki/src/main/session/storage.ts:290"
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/session/storage.ts:280"
     },
     {
       "id": "file::replay",
@@ -4341,20 +4341,6 @@
       "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/scripts/test-skillProfile.ts:37"
     },
     {
-      "id": "file::test_specter",
-      "label": "test-specter.ts",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/scripts/test-specter.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/scripts/test-specter.ts:1"
-    },
-    {
-      "id": "test_specter::main",
-      "label": "main",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/scripts/test-specter.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/scripts/test-specter.ts:6"
-    },
-    {
       "id": "file::tts",
       "label": "tts.ts",
       "fileType": "code",
@@ -4584,405 +4570,6 @@
       "fileType": "code",
       "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/context/contextTracker.ts",
       "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/context/contextTracker.ts:450"
-    },
-    {
-      "id": "file::dashboard",
-      "label": "dashboard.ts",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:1"
-    },
-    {
-      "id": "dashboard::wikiroot",
-      "label": "wikiRoot",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:11"
-    },
-    {
-      "id": "dashboard::graphsdir",
-      "label": "graphsDir",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:18"
-    },
-    {
-      "id": "dashboard::parsefrontmatter",
-      "label": "parseFrontmatter",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:33"
-    },
-    {
-      "id": "dashboard::listmarkdownfiles",
-      "label": "listMarkdownFiles",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:49"
-    },
-    {
-      "id": "dashboard::readmemories",
-      "label": "readMemories",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:60"
-    },
-    {
-      "id": "dashboard::graphsources",
-      "label": "graphSources",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:91"
-    },
-    {
-      "id": "dashboard::readprogress",
-      "label": "readProgress",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:113"
-    },
-    {
-      "id": "dashboard::registerdashboardipc",
-      "label": "registerDashboardIpc",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:162"
-    },
-    {
-      "id": "dashboard::showdashboardwindow",
-      "label": "showDashboardWindow",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:175"
-    },
-    {
-      "id": "file::index",
-      "label": "index.ts",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:1"
-    },
-    {
-      "id": "index::isbrokenpipeerror",
-      "label": "isBrokenPipeError",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:159"
-    },
-    {
-      "id": "index::captureforegroundappnow",
-      "label": "captureForegroundAppNow",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:213"
-    },
-    {
-      "id": "index::getcachedforegroundappidentifier",
-      "label": "getCachedForegroundAppIdentifier",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:254"
-    },
-    {
-      "id": "index::createclinicalwindow",
-      "label": "createClinicalWindow",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:269"
-    },
-    {
-      "id": "index::showclinicalwindow",
-      "label": "showClinicalWindow",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:303"
-    },
-    {
-      "id": "index::bufferfromaudiodata",
-      "label": "bufferFromAudioData",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:309"
-    },
-    {
-      "id": "index::bytelengthofaudiodata",
-      "label": "byteLengthOfAudioData",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:325"
-    },
-    {
-      "id": "index::displaysummary",
-      "label": "displaySummary",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:332"
-    },
-    {
-      "id": "index::getsummondisplay",
-      "label": "getSummonDisplay",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:346"
-    },
-    {
-      "id": "index::enableoverlayworkspacebehavior",
-      "label": "enableOverlayWorkspaceBehavior",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:361"
-    },
-    {
-      "id": "index::moveoverlaytodisplay",
-      "label": "moveOverlayToDisplay",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:381"
-    },
-    {
-      "id": "index::centercontentbounds",
-      "label": "centerContentBounds",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:403"
-    },
-    {
-      "id": "index::movepracticewindowtodisplay",
-      "label": "movePracticeWindowToDisplay",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:417"
-    },
-    {
-      "id": "index::overlayisondisplay",
-      "label": "overlayIsOnDisplay",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:437"
-    },
-    {
-      "id": "index::routevisiblewindowstodisplay",
-      "label": "routeVisibleWindowsToDisplay",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:442"
-    },
-    {
-      "id": "index::registerwindowroutinglisteners",
-      "label": "registerWindowRoutingListeners",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:449"
-    },
-    {
-      "id": "index::delay",
-      "label": "delay",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:476"
-    },
-    {
-      "id": "index::clamppercent",
-      "label": "clampPercent",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:480"
-    },
-    {
-      "id": "index::confidencevalue",
-      "label": "confidenceValue",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:486"
-    },
-    {
-      "id": "index::realappaction",
-      "label": "realAppAction",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:492"
-    },
-    {
-      "id": "index::safelabel",
-      "label": "safeLabel",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:496"
-    },
-    {
-      "id": "index::instructionfortarget",
-      "label": "instructionForTarget",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:500"
-    },
-    {
-      "id": "index::createrealappstep",
-      "label": "createRealAppStep",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:507"
-    },
-    {
-      "id": "index::realappnodeid",
-      "label": "realAppNodeId",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:549"
-    },
-    {
-      "id": "index::islearninggraph",
-      "label": "isLearningGraph",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:556"
-    },
-    {
-      "id": "index::safesend",
-      "label": "safeSend",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:568"
-    },
-    {
-      "id": "index::sendoverlayevent",
-      "label": "sendOverlayEvent",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:580"
-    },
-    {
-      "id": "index::sortedbehavioralcheckpoints",
-      "label": "sortedBehavioralCheckpoints",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:584"
-    },
-    {
-      "id": "index::behavioralcheckpointforid",
-      "label": "behavioralCheckpointForId",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:593"
-    },
-    {
-      "id": "index::newestbehavioralcheckpoint",
-      "label": "newestBehavioralCheckpoint",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:603"
-    },
-    {
-      "id": "index::realbehavioralframecount",
-      "label": "realBehavioralFrameCount",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:610"
-    },
-    {
-      "id": "index::hasrealbehavioralsignature",
-      "label": "hasRealBehavioralSignature",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:617"
-    },
-    {
-      "id": "index::realcheckpointornull",
-      "label": "realCheckpointOrNull",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:624"
-    },
-    {
-      "id": "index::safefeedbackarm",
-      "label": "safeFeedbackArm",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:630"
-    },
-    {
-      "id": "index::lateststepsfornode",
-      "label": "latestStepsForNode",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:634"
-    },
-    {
-      "id": "index::selectmirrorsignature",
-      "label": "selectMirrorSignature",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:642"
-    },
-    {
-      "id": "index::toggleoverlay",
-      "label": "toggleOverlay",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:666"
-    },
-    {
-      "id": "index::createwindow",
-      "label": "createWindow",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:779"
-    },
-    {
-      "id": "index::createoverlaywindow",
-      "label": "createOverlayWindow",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:819"
-    },
-    {
-      "id": "index::failmirrorrun",
-      "label": "failMirrorRun",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:1856"
-    },
-    {
-      "id": "file::memorysidecar",
-      "label": "memorySidecar.ts",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:1"
-    },
-    {
-      "id": "memorysidecar::memoryserviceport",
-      "label": "memoryServicePort",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:8"
-    },
-    {
-      "id": "memorysidecar::posttomemoryservice",
-      "label": "postToMemoryService",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:12"
-    },
-    {
-      "id": "memorysidecar::issidecarhealthy",
-      "label": "isSidecarHealthy",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:29"
-    },
-    {
-      "id": "memorysidecar::startmemorysidecar",
-      "label": "startMemorySidecar",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:43"
-    },
-    {
-      "id": "memorysidecar::waitforsidecarready",
-      "label": "waitForSidecarReady",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:110"
     },
     {
       "id": "replayauto::clinicalsafetyfilterenabled",
@@ -5363,377 +4950,6 @@
       "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/viewportCoords.ts:43"
     },
     {
-      "id": "file::overlayapp",
-      "label": "OverlayApp.tsx",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1"
-    },
-    {
-      "id": "overlayapp::messagefromerror",
-      "label": "messageFromError",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:116"
-    },
-    {
-      "id": "overlayapp::isnotehtmlcompilationintent",
-      "label": "isNoteHtmlCompilationIntent",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:122"
-    },
-    {
-      "id": "overlayapp::confirmautomationgate",
-      "label": "confirmAutomationGate",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:136"
-    },
-    {
-      "id": "overlayapp::finitepercent",
-      "label": "finitePercent",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:147"
-    },
-    {
-      "id": "overlayapp::cursortargetdistancepx",
-      "label": "cursorTargetDistancePx",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:153"
-    },
-    {
-      "id": "overlayapp::cursorrevealtuning",
-      "label": "cursorRevealTuning",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:167"
-    },
-    {
-      "id": "overlayapp::formatcoordinate",
-      "label": "formatCoordinate",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:198"
-    },
-    {
-      "id": "overlayapp::confidencepercent",
-      "label": "confidencePercent",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:204"
-    },
-    {
-      "id": "overlayapp::realapptargetkey",
-      "label": "realAppTargetKey",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:209"
-    },
-    {
-      "id": "overlayapp::samerealapptarget",
-      "label": "sameRealAppTarget",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:218"
-    },
-    {
-      "id": "overlayapp::behaviorpercent",
-      "label": "behaviorPercent",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:226"
-    },
-    {
-      "id": "overlayapp::signedbehaviorpercent",
-      "label": "signedBehaviorPercent",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:232"
-    },
-    {
-      "id": "overlayapp::latestcheckpoint",
-      "label": "latestCheckpoint",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:238"
-    },
-    {
-      "id": "overlayapp::firstcheckpoint",
-      "label": "firstCheckpoint",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:244"
-    },
-    {
-      "id": "overlayapp::formataihealthstatus",
-      "label": "formatAIHealthStatus",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:250"
-    },
-    {
-      "id": "overlayapp::realappinstruction",
-      "label": "realAppInstruction",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:295"
-    },
-    {
-      "id": "overlayapp::normalizedrealapptarget",
-      "label": "normalizedRealAppTarget",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:303"
-    },
-    {
-      "id": "overlayapp::walkthroughstepfromreplay",
-      "label": "walkthroughStepFromReplay",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:352"
-    },
-    {
-      "id": "OverlayApp::fetchmode",
-      "label": "fetchMode",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:371"
-    },
-    {
-      "id": "OverlayApp::setinteractivity",
-      "label": "setInteractivity",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:528"
-    },
-    {
-      "id": "OverlayApp::speakifultra",
-      "label": "speakIfUltra",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:544"
-    },
-    {
-      "id": "OverlayApp::logtargetcoordinatealignment",
-      "label": "logTargetCoordinateAlignment",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:684"
-    },
-    {
-      "id": "OverlayApp::computepreviewghoststart",
-      "label": "computePreviewGhostStart",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:748"
-    },
-    {
-      "id": "OverlayApp::clearliveghost",
-      "label": "clearLiveGhost",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:777"
-    },
-    {
-      "id": "OverlayApp::scheduleliveghostdismiss",
-      "label": "scheduleLiveGhostDismiss",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:792"
-    },
-    {
-      "id": "OverlayApp::applylivetargetfromresult",
-      "label": "applyLiveTargetFromResult",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:811"
-    },
-    {
-      "id": "OverlayApp::startdemowalkthrough",
-      "label": "startDemoWalkthrough",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:849"
-    },
-    {
-      "id": "OverlayApp::handleultraspokeninput",
-      "label": "handleUltraSpokenInput",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:869"
-    },
-    {
-      "id": "OverlayApp::updatecursorreveal",
-      "label": "updateCursorReveal",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1038"
-    },
-    {
-      "id": "OverlayApp::onkeydown",
-      "label": "onKeyDown",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1360"
-    },
-    {
-      "id": "OverlayApp::runlegacyplannerflow",
-      "label": "runLegacyPlannerFlow",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1630"
-    },
-    {
-      "id": "OverlayApp::replaysavedworkflow",
-      "label": "replaySavedWorkflow",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1707"
-    },
-    {
-      "id": "OverlayApp::preparecontrolleddemo",
-      "label": "prepareControlledDemo",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1758"
-    },
-    {
-      "id": "OverlayApp::runnotehtmlagent",
-      "label": "runNoteHtmlAgent",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1785"
-    },
-    {
-      "id": "OverlayApp::startrealapptest",
-      "label": "startRealAppTest",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1853"
-    },
-    {
-      "id": "OverlayApp::selectrealapptarget",
-      "label": "selectRealAppTarget",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1976"
-    },
-    {
-      "id": "OverlayApp::startmanualtargetpicking",
-      "label": "startManualTargetPicking",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1989"
-    },
-    {
-      "id": "OverlayApp::cancelmanualtargetpicking",
-      "label": "cancelManualTargetPicking",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2003"
-    },
-    {
-      "id": "OverlayApp::updatemanualpickpoint",
-      "label": "updateManualPickPoint",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2009"
-    },
-    {
-      "id": "OverlayApp::handlemanualtargetpick",
-      "label": "handleManualTargetPick",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2016"
-    },
-    {
-      "id": "OverlayApp::startrealappwalkthrough",
-      "label": "startRealAppWalkthrough",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2074"
-    },
-    {
-      "id": "OverlayApp::runcoordinatecalibration",
-      "label": "runCoordinateCalibration",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2146"
-    },
-    {
-      "id": "OverlayApp::checkaibackend",
-      "label": "checkAIBackend",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2162"
-    },
-    {
-      "id": "OverlayApp::movecursortoscreencenter",
-      "label": "moveCursorToScreenCenter",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2179"
-    },
-    {
-      "id": "OverlayApp::refreshbehaviordiff",
-      "label": "refreshBehaviorDiff",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2194"
-    },
-    {
-      "id": "OverlayApp::seedspecdemo",
-      "label": "seedSpecDemo",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2212"
-    },
-    {
-      "id": "OverlayApp::createbehaviorcheckpoint",
-      "label": "createBehaviorCheckpoint",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2235"
-    },
-    {
-      "id": "OverlayApp::updateblendpreview",
-      "label": "updateBlendPreview",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2258"
-    },
-    {
-      "id": "OverlayApp::runmirrormode",
-      "label": "runMirrorMode",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2277"
-    },
-    {
-      "id": "OverlayApp::submitmirrorfeedback",
-      "label": "submitMirrorFeedback",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2325"
-    },
-    {
-      "id": "OverlayApp::startnewchat",
-      "label": "startNewChat",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2357"
-    },
-    {
-      "id": "overlayapp::async",
-      "label": "async",
-      "fileType": "code",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:3868"
-    },
-    {
       "id": "file::test_memory_integration",
       "label": "test-memory-integration.ts",
       "fileType": "code",
@@ -6047,6 +5263,783 @@
       "fileType": "code",
       "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/stepHistory.ts",
       "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/stepHistory.ts:90"
+    },
+    {
+      "id": "file::test_specter",
+      "label": "test-specter.ts",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/scripts/test-specter.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/scripts/test-specter.ts:1"
+    },
+    {
+      "id": "test_specter::main",
+      "label": "main",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/scripts/test-specter.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/scripts/test-specter.ts:6"
+    },
+    {
+      "id": "file::dashboard",
+      "label": "dashboard.ts",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:1"
+    },
+    {
+      "id": "dashboard::wikiroot",
+      "label": "wikiRoot",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:11"
+    },
+    {
+      "id": "dashboard::graphsdir",
+      "label": "graphsDir",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:18"
+    },
+    {
+      "id": "dashboard::parsefrontmatter",
+      "label": "parseFrontmatter",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:33"
+    },
+    {
+      "id": "dashboard::listmarkdownfiles",
+      "label": "listMarkdownFiles",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:49"
+    },
+    {
+      "id": "dashboard::readmemories",
+      "label": "readMemories",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:60"
+    },
+    {
+      "id": "dashboard::graphsources",
+      "label": "graphSources",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:91"
+    },
+    {
+      "id": "dashboard::readprogress",
+      "label": "readProgress",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:104"
+    },
+    {
+      "id": "dashboard::registerdashboardipc",
+      "label": "registerDashboardIpc",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:153"
+    },
+    {
+      "id": "dashboard::showdashboardwindow",
+      "label": "showDashboardWindow",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/dashboard.ts:166"
+    },
+    {
+      "id": "file::index",
+      "label": "index.ts",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:1"
+    },
+    {
+      "id": "index::isbrokenpipeerror",
+      "label": "isBrokenPipeError",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:153"
+    },
+    {
+      "id": "index::captureforegroundappnow",
+      "label": "captureForegroundAppNow",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:207"
+    },
+    {
+      "id": "index::getcachedforegroundappidentifier",
+      "label": "getCachedForegroundAppIdentifier",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:248"
+    },
+    {
+      "id": "index::createclinicalwindow",
+      "label": "createClinicalWindow",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:263"
+    },
+    {
+      "id": "index::showclinicalwindow",
+      "label": "showClinicalWindow",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:297"
+    },
+    {
+      "id": "index::bufferfromaudiodata",
+      "label": "bufferFromAudioData",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:303"
+    },
+    {
+      "id": "index::bytelengthofaudiodata",
+      "label": "byteLengthOfAudioData",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:319"
+    },
+    {
+      "id": "index::displaysummary",
+      "label": "displaySummary",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:326"
+    },
+    {
+      "id": "index::getsummondisplay",
+      "label": "getSummonDisplay",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:340"
+    },
+    {
+      "id": "index::enableoverlayworkspacebehavior",
+      "label": "enableOverlayWorkspaceBehavior",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:355"
+    },
+    {
+      "id": "index::moveoverlaytodisplay",
+      "label": "moveOverlayToDisplay",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:375"
+    },
+    {
+      "id": "index::centercontentbounds",
+      "label": "centerContentBounds",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:397"
+    },
+    {
+      "id": "index::movepracticewindowtodisplay",
+      "label": "movePracticeWindowToDisplay",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:414"
+    },
+    {
+      "id": "index::overlayisondisplay",
+      "label": "overlayIsOnDisplay",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:434"
+    },
+    {
+      "id": "index::routevisiblewindowstodisplay",
+      "label": "routeVisibleWindowsToDisplay",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:439"
+    },
+    {
+      "id": "index::registerwindowroutinglisteners",
+      "label": "registerWindowRoutingListeners",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:446"
+    },
+    {
+      "id": "index::delay",
+      "label": "delay",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:473"
+    },
+    {
+      "id": "index::clamppercent",
+      "label": "clampPercent",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:477"
+    },
+    {
+      "id": "index::confidencevalue",
+      "label": "confidenceValue",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:483"
+    },
+    {
+      "id": "index::realappaction",
+      "label": "realAppAction",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:489"
+    },
+    {
+      "id": "index::safelabel",
+      "label": "safeLabel",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:493"
+    },
+    {
+      "id": "index::instructionfortarget",
+      "label": "instructionForTarget",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:497"
+    },
+    {
+      "id": "index::createrealappstep",
+      "label": "createRealAppStep",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:504"
+    },
+    {
+      "id": "index::realappnodeid",
+      "label": "realAppNodeId",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:546"
+    },
+    {
+      "id": "index::islearninggraph",
+      "label": "isLearningGraph",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:553"
+    },
+    {
+      "id": "index::safesend",
+      "label": "safeSend",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:565"
+    },
+    {
+      "id": "index::sendoverlayevent",
+      "label": "sendOverlayEvent",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:577"
+    },
+    {
+      "id": "index::sortedbehavioralcheckpoints",
+      "label": "sortedBehavioralCheckpoints",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:581"
+    },
+    {
+      "id": "index::behavioralcheckpointforid",
+      "label": "behavioralCheckpointForId",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:590"
+    },
+    {
+      "id": "index::newestbehavioralcheckpoint",
+      "label": "newestBehavioralCheckpoint",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:600"
+    },
+    {
+      "id": "index::realbehavioralframecount",
+      "label": "realBehavioralFrameCount",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:607"
+    },
+    {
+      "id": "index::hasrealbehavioralsignature",
+      "label": "hasRealBehavioralSignature",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:614"
+    },
+    {
+      "id": "index::realcheckpointornull",
+      "label": "realCheckpointOrNull",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:621"
+    },
+    {
+      "id": "index::safefeedbackarm",
+      "label": "safeFeedbackArm",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:627"
+    },
+    {
+      "id": "index::lateststepsfornode",
+      "label": "latestStepsForNode",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:631"
+    },
+    {
+      "id": "index::selectmirrorsignature",
+      "label": "selectMirrorSignature",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:639"
+    },
+    {
+      "id": "index::toggleoverlay",
+      "label": "toggleOverlay",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:663"
+    },
+    {
+      "id": "index::createwindow",
+      "label": "createWindow",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:776"
+    },
+    {
+      "id": "index::createoverlaywindow",
+      "label": "createOverlayWindow",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:816"
+    },
+    {
+      "id": "index::failmirrorrun",
+      "label": "failMirrorRun",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/index.ts:1793"
+    },
+    {
+      "id": "file::memorysidecar",
+      "label": "memorySidecar.ts",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:1"
+    },
+    {
+      "id": "memorysidecar::memoryserviceport",
+      "label": "memoryServicePort",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:12"
+    },
+    {
+      "id": "memorysidecar::posttomemoryservice",
+      "label": "postToMemoryService",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:16"
+    },
+    {
+      "id": "memorysidecar::issidecarhealthy",
+      "label": "isSidecarHealthy",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:33"
+    },
+    {
+      "id": "memorysidecar::startmemorysidecar",
+      "label": "startMemorySidecar",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:47"
+    },
+    {
+      "id": "memorysidecar::waitforsidecarready",
+      "label": "waitForSidecarReady",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:114"
+    },
+    {
+      "id": "file::overlayapp",
+      "label": "OverlayApp.tsx",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1"
+    },
+    {
+      "id": "overlayapp::messagefromerror",
+      "label": "messageFromError",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:116"
+    },
+    {
+      "id": "overlayapp::isnotehtmlcompilationintent",
+      "label": "isNoteHtmlCompilationIntent",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:122"
+    },
+    {
+      "id": "overlayapp::confirmautomationgate",
+      "label": "confirmAutomationGate",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:136"
+    },
+    {
+      "id": "overlayapp::finitepercent",
+      "label": "finitePercent",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:147"
+    },
+    {
+      "id": "overlayapp::cursortargetdistancepx",
+      "label": "cursorTargetDistancePx",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:153"
+    },
+    {
+      "id": "overlayapp::cursorrevealtuning",
+      "label": "cursorRevealTuning",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:167"
+    },
+    {
+      "id": "overlayapp::formatcoordinate",
+      "label": "formatCoordinate",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:198"
+    },
+    {
+      "id": "overlayapp::confidencepercent",
+      "label": "confidencePercent",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:204"
+    },
+    {
+      "id": "overlayapp::realapptargetkey",
+      "label": "realAppTargetKey",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:209"
+    },
+    {
+      "id": "overlayapp::samerealapptarget",
+      "label": "sameRealAppTarget",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:218"
+    },
+    {
+      "id": "overlayapp::behaviorpercent",
+      "label": "behaviorPercent",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:226"
+    },
+    {
+      "id": "overlayapp::signedbehaviorpercent",
+      "label": "signedBehaviorPercent",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:232"
+    },
+    {
+      "id": "overlayapp::latestcheckpoint",
+      "label": "latestCheckpoint",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:238"
+    },
+    {
+      "id": "overlayapp::firstcheckpoint",
+      "label": "firstCheckpoint",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:244"
+    },
+    {
+      "id": "overlayapp::formataihealthstatus",
+      "label": "formatAIHealthStatus",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:250"
+    },
+    {
+      "id": "overlayapp::realappinstruction",
+      "label": "realAppInstruction",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:295"
+    },
+    {
+      "id": "overlayapp::normalizedrealapptarget",
+      "label": "normalizedRealAppTarget",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:303"
+    },
+    {
+      "id": "overlayapp::walkthroughstepfromreplay",
+      "label": "walkthroughStepFromReplay",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:352"
+    },
+    {
+      "id": "OverlayApp::fetchmode",
+      "label": "fetchMode",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:371"
+    },
+    {
+      "id": "OverlayApp::setinteractivity",
+      "label": "setInteractivity",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:520"
+    },
+    {
+      "id": "OverlayApp::speakifultra",
+      "label": "speakIfUltra",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:536"
+    },
+    {
+      "id": "OverlayApp::logtargetcoordinatealignment",
+      "label": "logTargetCoordinateAlignment",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:675"
+    },
+    {
+      "id": "OverlayApp::computepreviewghoststart",
+      "label": "computePreviewGhostStart",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:739"
+    },
+    {
+      "id": "OverlayApp::clearliveghost",
+      "label": "clearLiveGhost",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:768"
+    },
+    {
+      "id": "OverlayApp::scheduleliveghostdismiss",
+      "label": "scheduleLiveGhostDismiss",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:783"
+    },
+    {
+      "id": "OverlayApp::applylivetargetfromresult",
+      "label": "applyLiveTargetFromResult",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:802"
+    },
+    {
+      "id": "OverlayApp::handleultraspokeninput",
+      "label": "handleUltraSpokenInput",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:843"
+    },
+    {
+      "id": "OverlayApp::updatecursorreveal",
+      "label": "updateCursorReveal",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1006"
+    },
+    {
+      "id": "OverlayApp::onkeydown",
+      "label": "onKeyDown",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1326"
+    },
+    {
+      "id": "OverlayApp::runlegacyplannerflow",
+      "label": "runLegacyPlannerFlow",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1596"
+    },
+    {
+      "id": "OverlayApp::replaysavedworkflow",
+      "label": "replaySavedWorkflow",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1673"
+    },
+    {
+      "id": "OverlayApp::preparecontrolleddemo",
+      "label": "prepareControlledDemo",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1724"
+    },
+    {
+      "id": "OverlayApp::runnotehtmlagent",
+      "label": "runNoteHtmlAgent",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1751"
+    },
+    {
+      "id": "OverlayApp::startrealapptest",
+      "label": "startRealAppTest",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1819"
+    },
+    {
+      "id": "OverlayApp::selectrealapptarget",
+      "label": "selectRealAppTarget",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1942"
+    },
+    {
+      "id": "OverlayApp::startmanualtargetpicking",
+      "label": "startManualTargetPicking",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1955"
+    },
+    {
+      "id": "OverlayApp::cancelmanualtargetpicking",
+      "label": "cancelManualTargetPicking",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1969"
+    },
+    {
+      "id": "OverlayApp::updatemanualpickpoint",
+      "label": "updateManualPickPoint",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1975"
+    },
+    {
+      "id": "OverlayApp::handlemanualtargetpick",
+      "label": "handleManualTargetPick",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:1982"
+    },
+    {
+      "id": "OverlayApp::startrealappwalkthrough",
+      "label": "startRealAppWalkthrough",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2040"
+    },
+    {
+      "id": "OverlayApp::runcoordinatecalibration",
+      "label": "runCoordinateCalibration",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2112"
+    },
+    {
+      "id": "OverlayApp::checkaibackend",
+      "label": "checkAIBackend",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2128"
+    },
+    {
+      "id": "OverlayApp::movecursortoscreencenter",
+      "label": "moveCursorToScreenCenter",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2145"
+    },
+    {
+      "id": "OverlayApp::refreshbehaviordiff",
+      "label": "refreshBehaviorDiff",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2160"
+    },
+    {
+      "id": "OverlayApp::seedspecdemo",
+      "label": "seedSpecDemo",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2178"
+    },
+    {
+      "id": "OverlayApp::createbehaviorcheckpoint",
+      "label": "createBehaviorCheckpoint",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2201"
+    },
+    {
+      "id": "OverlayApp::updateblendpreview",
+      "label": "updateBlendPreview",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2224"
+    },
+    {
+      "id": "OverlayApp::runmirrormode",
+      "label": "runMirrorMode",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2243"
+    },
+    {
+      "id": "OverlayApp::submitmirrorfeedback",
+      "label": "submitMirrorFeedback",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2291"
+    },
+    {
+      "id": "OverlayApp::startnewchat",
+      "label": "startNewChat",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:2323"
+    },
+    {
+      "id": "overlayapp::async",
+      "label": "async",
+      "fileType": "code",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:3834"
     }
   ],
   "edges": [
@@ -12225,42 +12218,6 @@
       "weight": 1
     },
     {
-      "source": "file::memorysidecar",
-      "target": "memorysidecar::memoryserviceport",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:8",
-      "weight": 1
-    },
-    {
-      "source": "file::memorysidecar",
-      "target": "memorysidecar::posttomemoryservice",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:12",
-      "weight": 1
-    },
-    {
-      "source": "file::memorysidecar",
-      "target": "memorysidecar::issidecarhealthy",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:29",
-      "weight": 1
-    },
-    {
-      "source": "file::memorysidecar",
-      "target": "memorysidecar::waitforsidecarready",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:110",
-      "weight": 1
-    },
-    {
       "source": "file::replayauto",
       "target": "replayauto::clinicalsafetyfilterenabled",
       "relation": "contains",
@@ -12411,42 +12368,6 @@
       "confidence": "EXTRACTED",
       "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/viewportCoords.ts",
       "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/viewportCoords.ts:43",
-      "weight": 1
-    },
-    {
-      "source": "file::overlayapp",
-      "target": "OverlayApp::clearliveghost",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:777",
-      "weight": 1
-    },
-    {
-      "source": "file::overlayapp",
-      "target": "OverlayApp::scheduleliveghostdismiss",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:792",
-      "weight": 1
-    },
-    {
-      "source": "file::overlayapp",
-      "target": "OverlayApp::applylivetargetfromresult",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:811",
-      "weight": 1
-    },
-    {
-      "source": "file::overlayapp",
-      "target": "OverlayApp::startdemowalkthrough",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
-      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:849",
       "weight": 1
     },
     {
@@ -12736,12 +12657,75 @@
       "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/stepHistory.ts",
       "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/overlay/stepHistory.ts:90",
       "weight": 1
+    },
+    {
+      "source": "file::memorysidecar",
+      "target": "memorysidecar::memoryserviceport",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:12",
+      "weight": 1
+    },
+    {
+      "source": "file::memorysidecar",
+      "target": "memorysidecar::posttomemoryservice",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:16",
+      "weight": 1
+    },
+    {
+      "source": "file::memorysidecar",
+      "target": "memorysidecar::issidecarhealthy",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:33",
+      "weight": 1
+    },
+    {
+      "source": "file::memorysidecar",
+      "target": "memorysidecar::waitforsidecarready",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/main/memorySidecar.ts:114",
+      "weight": 1
+    },
+    {
+      "source": "file::overlayapp",
+      "target": "OverlayApp::clearliveghost",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:768",
+      "weight": 1
+    },
+    {
+      "source": "file::overlayapp",
+      "target": "OverlayApp::scheduleliveghostdismiss",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:783",
+      "weight": 1
+    },
+    {
+      "source": "file::overlayapp",
+      "target": "OverlayApp::applylivetargetfromresult",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "sourceFile": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx",
+      "sourceLocation": "/Users/aritro/Downloads/HARNESS ENG HACK REAL/src/renderer/src/OverlayApp.tsx:802",
+      "weight": 1
     }
   ],
   "metadata": {
     "files": 133,
-    "nodes": 864,
-    "edges": 743,
-    "builtAt": "2026-06-12T21:10:11.883Z"
+    "nodes": 863,
+    "edges": 742,
+    "builtAt": "2026-06-12T21:50:23.723Z"
   }
 }

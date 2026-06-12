@@ -32,7 +32,9 @@ function profilesPath(): string {
 
 function stringArray(value: any): string[] {
   return Array.isArray(value)
-    ? Array.from(new Set(value.filter((v) => typeof v === "string" && v.trim())))
+    ? Array.from(
+        new Set(value.filter((v) => typeof v === "string" && v.trim())),
+      )
     : [];
 }
 
@@ -54,7 +56,9 @@ export function loadProfiles(): ProfilePayload {
   try {
     const parsed = JSON.parse(readFileSync(filePath, "utf8"));
     const apps =
-      parsed && typeof parsed.apps === "object" && parsed.apps ? parsed.apps : {};
+      parsed && typeof parsed.apps === "object" && parsed.apps
+        ? parsed.apps
+        : {};
     return {
       apps: Object.fromEntries(
         Object.entries(apps).map(([k, v]) => [k, normalizeProfile(v)]),

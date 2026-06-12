@@ -136,9 +136,9 @@ export const GhostWikiPanel: React.FC = () => {
     setIsBusy(true);
     addLog("Compiling + Ingesting Wiki...");
     try {
-      // "event-recap-session-1" is the ID expected to be found in demo-workflows/event-recap/graph.json
-      // By calling ghostwikiIngestSession, the main process explicitely loads the demo workflow and compiles it.
-      await api.ghostwikiIngestSession("event-recap-session-1", "Luma");
+      // Ingests the current session's workflow into GhostWiki for future recall.
+      // No demo seeds — only real user-recorded sessions.
+      await api.ghostwikiIngestCurrentSession("", "Current App");
       updateLastLog("pass");
     } catch (e) {
       console.error(e);

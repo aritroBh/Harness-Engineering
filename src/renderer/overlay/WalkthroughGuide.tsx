@@ -65,7 +65,9 @@ export const WalkthroughGuide: React.FC<WalkthroughGuideProps> = ({ step }) => {
           )}
           <Callout
             variant={isLocked ? "success" : isWait ? "warning" : "info"}
-            title={isLocked ? "Ready to click" : isWait ? "Waiting" : "Next step"}
+            title={
+              isLocked ? "Ready to click" : isWait ? "Waiting" : "Next step"
+            }
             description={step.instruction || step.targetLabel}
             className="walkthrough-guide-callout"
           />

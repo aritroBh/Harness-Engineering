@@ -8,6 +8,16 @@ import {
   readViewportDims,
 } from "./viewportCoords";
 
+const FALLBACK_POSITION = { x: 50, y: 50 };
+
+function getStepPosition(step: any): { x: number; y: number } | null {
+  if (!step) return null;
+  const x = step.viewportX ?? step.x;
+  const y = step.viewportY ?? step.y;
+  if (x == null || y == null) return null;
+  return { x: clampPercent(x), y: clampPercent(y) };
+}
+
 export interface GhostActionPlayerProps {
   step: any;
   isActive: boolean;
@@ -29,13 +39,8 @@ export const GhostActionPlayer: React.FC<GhostActionPlayerProps> = ({
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const target =
-    step && (step.viewportX != null || step.x != null)
-      ? {
-          x: step.viewportX ?? step.x,
-          y: step.viewportY ?? step.y,
-        }
-      : null;
+  const stepPos = getStepPosition(step);
+  const target = stepPos || (isActive ? FALLBACK_POSITION : null);
 
   const { percentX, percentY, isTraveling, isArrived } = useGhostTravel(
     isActive ? target : null,
@@ -61,14 +66,14 @@ export const GhostActionPlayer: React.FC<GhostActionPlayerProps> = ({
     return () => window.clearInterval(id);
   }, [isArrived, step?.action]);
 
-  if (!isActive || !step || !target) return null;
+  if (!isActive || !step) return null;
 
   const action = step.action || "click";
   const px = clampPercent(percentX);
   const py = clampPercent(percentY);
 
-  const travelDx = target.x - prevPosRef.current.x;
-  const travelDy = target.y - prevPosRef.current.y;
+  const travelDx = (target?.x ?? px) - prevPosRef.current.x;
+  const travelDy = (target?.y ?? py) - prevPosRef.current.y;
   const travelLen = Math.hypot(travelDx, travelDy) || 1;
   const trailOffsetX = (-travelDx / travelLen) * 6;
   const trailOffsetY = (-travelDy / travelLen) * 6;
@@ -85,7 +90,13 @@ export const GhostActionPlayer: React.FC<GhostActionPlayerProps> = ({
           className="openui-ghost-cursor-host openui-ghost-cursor-host--trail"
           style={{
             ...hostStyle,
-            transform: cursorTransform(px, py, dims, trailOffsetX, trailOffsetY),
+            transform: cursorTransform(
+              px,
+              py,
+              dims,
+              trailOffsetX,
+              trailOffsetY,
+            ),
           }}
         >
           <GhostCursorIcon />
