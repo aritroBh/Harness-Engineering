@@ -80,7 +80,17 @@ class Embedder:
 
         # OpenAI-compatible HTTP call (TrueFoundry / Voyage / OpenAI)
         url = f"{self.base_url.rstrip('/')}/embeddings"
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        # A browser-like User-Agent is required: TrueFoundry's gateway sits behind
+        # Cloudflare, which blocks default Python UAs with HTTP 403 (error 1010).
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": os.getenv(
+                "EMBED_USER_AGENT",
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+            ),
+        }
         payload = {"model": self.model, "input": texts}
         with httpx.Client(timeout=60) as client:
             resp = client.post(url, headers=headers, json=payload)

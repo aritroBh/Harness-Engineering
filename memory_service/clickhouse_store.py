@@ -38,6 +38,8 @@ class ClickHouseRetriever:
         if not host:
             logger.info("CLICKHOUSE_HOST unset -> ClickHouseRetriever disabled.")
             return
+        # Accept either a bare host or a full URL (https://host:8443) in the env.
+        host = host.replace("https://", "").replace("http://", "").split("/")[0].split(":")[0]
         try:
             import clickhouse_connect
             secure = os.getenv("CLICKHOUSE_SECURE", "true").lower() == "true"
