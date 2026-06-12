@@ -741,8 +741,8 @@ async function main() {
   );
   check(
     whisperBody.includes("gemini-2.5-flash") &&
-      whisperBody.includes("gemini-2.0-flash"),
-    "whisper.ts supports gemini-2.5-flash with gemini-2.0-flash fallback",
+      whisperBody.includes("gemini-2.5-flash-lite"),
+    "whisper.ts supports gemini-2.5-flash with gemini-2.5-flash-lite fallback",
   );
   check(
     inputBarBody.includes('result.message || "No transcription returned'),

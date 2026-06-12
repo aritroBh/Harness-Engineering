@@ -1,0 +1,686 @@
+From 58dd528a1addc16f8213bc4cfe9307b29f6a4a88 Mon Sep 17 00:00:00 2001
+From: Kshitij Jalan <kjalan3@illinois.edu>
+Date: Fri, 12 Jun 2026 15:32:08 -0700
+Subject: [PATCH] Fix ghost random talking, misheard questions, and invisible
+ ghost cursor
+
+- Hands-free listener: utterance clock starts at first speech (was 7s total
+  including thinking time), 1.5s trailing-silence confirm, 8s lead-silence
+  give-up, and a Whisper hallucination filter (transcriptFilter.ts) so
+  ambient noise can no longer become phantom user messages.
+- Summon no longer reads the proactive prediction aloud; it shows as a
+  silent bubble and the ghost listens immediately instead.
+- ultraConverse fallback now states honestly that the AI service is
+  unreachable instead of canned 'follow the ghost cursor' non-sequiturs.
+- GhostCursor (OpenUI-themed) now always visible: follows the real pointer
+  beside the mouse when idle, flies to exact targets during walkthroughs.
+- session:walkthrough with zero saved steps surfaces an error instead of
+  silently replaying nothing; demo graph path resolves via app path too.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+---
+ package.json                             |   1 +
+ scripts/test-transcript-filter.ts        |  77 ++++++++
+ src/main/ai/planner.ts                   |  23 +--
+ src/main/index.ts                        |   7 +
+ src/main/session/demoWorkflow.ts         |  27 ++-
+ src/renderer/overlay/GhostCursor.tsx     |  75 +++++++-
+ src/renderer/overlay/transcriptFilter.ts |  73 +++++++
+ src/renderer/src/OverlayApp.tsx          | 230 ++++++++++++-----------
+ 8 files changed, 373 insertions(+), 140 deletions(-)
+ create mode 100644 scripts/test-transcript-filter.ts
+ create mode 100644 src/renderer/overlay/transcriptFilter.ts
+
+diff --git a/package.json b/package.json
+index 0126772..8620fc8 100644
+--- a/package.json
++++ b/package.json
+@@ -19,6 +19,7 @@
+     "test:specter": "npx ts-node scripts/test-specter.ts",
+     "test:splitscreen": "npx ts-node scripts/test-splitscreen.ts",
+     "test:step-history": "npx ts-node --transpile-only scripts/test-step-history.ts",
++    "test:transcript-filter": "npx ts-node --transpile-only scripts/test-transcript-filter.ts",
+     "verify:openui": "npm run build && npx ts-node --transpile-only scripts/verify-openui.ts",
+     "test:live-ghost": "npx ts-node --transpile-only scripts/test-live-ghost-unit.ts",
+     "test:ultra-grounding": "npx ts-node --transpile-only scripts/test-ultra-live-target-grounding.ts",
+diff --git a/scripts/test-transcript-filter.ts b/scripts/test-transcript-filter.ts
+new file mode 100644
+index 0000000..101ee29
+--- /dev/null
++++ b/scripts/test-transcript-filter.ts
+@@ -0,0 +1,77 @@
++import {
++  isLikelyHallucinatedTranscript,
++  normalizeTranscript,
++  shouldAcceptAmbientTranscript,
++} from "../src/renderer/overlay/transcriptFilter";
++
++let failures = 0;
++
++function check(name: string, actual: unknown, expected: unknown): void {
++  if (actual === expected) {
++    console.log(`  ok: ${name}`);
++  } else {
++    failures++;
++    console.error(`  FAIL: ${name} — expected ${expected}, got ${actual}`);
++  }
++}
++
++console.log("normalizeTranscript");
++check("strips punctuation", normalizeTranscript("Thank you."), "thank you");
++check(
++  "strips brackets",
++  normalizeTranscript(" [BLANK_AUDIO] "),
++  "blank audio",
++);
++check("collapses spaces", normalizeTranscript("a   b"), "a b");
++
++console.log("isLikelyHallucinatedTranscript");
++const hallucinations = [
++  "Thank you.",
++  "Thanks for watching!",
++  "you",
++  ".",
++  "[Music]",
++  "(applause)",
++  "Bye.",
++  "",
++  "   ",
++  "♪♪",
++];
++for (const text of hallucinations) {
++  check(`rejects ${JSON.stringify(text)}`, isLikelyHallucinatedTranscript(text), true);
++}
++
++const realQuestions = [
++  "How do I create an event on Luma?",
++  "What does this button do?",
++  "Yes",
++  "No, the other one",
++  "Show me how to add it to my calendar",
++  "Can you walk me through creating a project?",
++];
++for (const text of realQuestions) {
++  check(`accepts ${JSON.stringify(text)}`, isLikelyHallucinatedTranscript(text), false);
++}
++
++console.log("shouldAcceptAmbientTranscript");
++check(
++  "rejects real text with too little voiced audio",
++  shouldAcceptAmbientTranscript("How do I create an event?", 150),
++  false,
++);
++check(
++  "accepts real text with enough voiced audio",
++  shouldAcceptAmbientTranscript("How do I create an event?", 900),
++  true,
++);
++check(
++  "rejects hallucination even with voiced audio",
++  shouldAcceptAmbientTranscript("Thank you.", 900),
++  false,
++);
++
++if (failures > 0) {
++  console.error(`\n${failures} check(s) failed`);
++  process.exit(1);
++}
++console.log("\nAll transcript filter checks passed");
+diff --git a/src/main/ai/planner.ts b/src/main/ai/planner.ts
+index f08ec97..d494f3f 100644
+--- a/src/main/ai/planner.ts
++++ b/src/main/ai/planner.ts
+@@ -570,26 +570,13 @@ export function parseUltraLiveTarget(
+   };
+ }
+ 
+-function fallbackUltraReply(message: string): UltraConverseResult {
+-  const lower = message.toLowerCase();
+-  if (lower.includes("what") && lower.includes("next")) {
+-    return {
+-      reply:
+-        "Move your cursor toward the highlighted target. I will wait until you are close.",
+-      intent: "repeat_step",
+-      shouldSpeak: true,
+-    };
+-  }
+-  if (lower.includes("why")) {
+-    return {
+-      reply: "This is the next step to accomplish your goal. Keep going!",
+-      intent: "clarify",
+-      shouldSpeak: true,
+-    };
+-  }
++// When the model is unreachable, say so. The old keyword-matched canned
++// replies ("Just follow the ghost cursor") ignored what the user actually
++// asked, which read as the ghost talking nonsense.
++function fallbackUltraReply(_message: string): UltraConverseResult {
+   return {
+     reply:
+-      "I am here to help you through the steps. Just follow the ghost cursor.",
++      "I couldn't reach my AI service just now, so I can't answer that properly. Check the Anthropic API key and your network, then ask me again.",
+     intent: "answer",
+     shouldSpeak: true,
+   };
+diff --git a/src/main/index.ts b/src/main/index.ts
+index ceacfd5..85c4cb0 100644
+--- a/src/main/index.ts
++++ b/src/main/index.ts
+@@ -1854,6 +1854,13 @@ app.whenReady().then(async () => {
+         : graph.sessions.filter((s) => s.steps.length > 0);
+       const latest = sessions.length > 0 ? sessions[sessions.length - 1] : null;
+       const steps = latest?.steps || [];
++      if (steps.length === 0) {
++        // Replaying zero steps looked like success while showing nothing —
++        // the renderer must hear about it so the user does too.
++        throw new Error(
++          "No saved workflow steps to walk through yet. Record a session or load the demo workflow first.",
++        );
++      }
+       await replayWalkthrough(steps, () => {});
+     },
+   );
+diff --git a/src/main/session/demoWorkflow.ts b/src/main/session/demoWorkflow.ts
+index 032136b..581aa57 100644
+--- a/src/main/session/demoWorkflow.ts
++++ b/src/main/session/demoWorkflow.ts
+@@ -1,4 +1,4 @@
+-import { BrowserWindow, screen } from "electron";
++import { app, BrowserWindow, screen } from "electron";
+ import { normalizePracticeWindowTargetToViewportPercent } from "../screenCoordinates";
+ import type { Step } from "./types";
+ 
+@@ -139,17 +139,24 @@ import { safeLog } from "../logger";
+ export function getDemoWorkflow() {
+   const specterMode = process.env.SPECTER_MODE || "ghostwiki";
+   if (specterMode === "ghostwiki") {
++    // cwd only matches the repo root in `npm run dev`; the packaged app and
++    // launches from other directories need the app path.
++    const roots = [process.cwd()];
+     try {
+-      const p = path.join(
+-        process.cwd(),
+-        "demo-workflows/event-recap/graph.json",
+-      );
+-      if (fs.existsSync(p)) {
+-        const data = JSON.parse(fs.readFileSync(p, "utf-8"));
+-        return data;
++      const appPath = app.getAppPath();
++      if (appPath && !roots.includes(appPath)) roots.push(appPath);
++    } catch {
++      // app not ready / non-electron context (ts-node scripts)
++    }
++    for (const root of roots) {
++      try {
++        const p = path.join(root, "demo-workflows/event-recap/graph.json");
++        if (fs.existsSync(p)) {
++          return JSON.parse(fs.readFileSync(p, "utf-8"));
++        }
++      } catch (e) {
++        safeLog("Failed to load ghostwiki demo graph", e);
+       }
+-    } catch (e) {
+-      safeLog("Failed to load ghostwiki demo graph", e);
+     }
+   }
+   return null;
+diff --git a/src/renderer/overlay/GhostCursor.tsx b/src/renderer/overlay/GhostCursor.tsx
+index 0bd4b53..d9bc555 100644
+--- a/src/renderer/overlay/GhostCursor.tsx
++++ b/src/renderer/overlay/GhostCursor.tsx
+@@ -1,4 +1,4 @@
+-import React, { useEffect, useState } from "react";
++import React, { useEffect, useRef, useState } from "react";
+ import {
+   clampPercent,
+   cursorTransform,
+@@ -11,14 +11,25 @@ interface GhostCursorProps {
+   mood?: string;
+   step?: any;
+   isSpeaking?: boolean;
++  /** Follow the user's real pointer when no step target exists. */
++  followPointer?: boolean;
+ }
+ 
++const POINTER_POLL_MS = 70;
++/** Pixel offset so the ghost hovers beside the real pointer, not under it. */
++const POINTER_OFFSET = { x: 30, y: -36 };
++
+ export const GhostCursor: React.FC<GhostCursorProps> = ({
+   isVisible,
+   step,
+   isSpeaking = false,
++  followPointer = true,
+ }) => {
+   const [dims, setDims] = useState(readViewportDims);
++  const [pointer, setPointer] = useState<{ x: number; y: number } | null>(
++    null,
++  );
++  const hasStep = Boolean(step);
+ 
+   useEffect(() => {
+     const update = () => setDims(readViewportDims());
+@@ -27,16 +38,70 @@ export const GhostCursor: React.FC<GhostCursorProps> = ({
+     return () => window.removeEventListener("resize", update);
+   }, []);
+ 
+-  if (!isVisible || !step) return null;
++  // Without a step target the ghost used to render nothing at all — the
++  // overlay had no cursor outside walkthroughs. Track the real pointer via
++  // the same main-process IPC the reveal effect uses, so the ghost is always
++  // on screen while the overlay is summoned.
++  useEffect(() => {
++    if (!isVisible || hasStep || !followPointer) return;
++
++    let disposed = false;
++    let timer: number | null = null;
++
++    const poll = async () => {
++      try {
++        const ipc = (window as any).api;
++        const pos = ipc?.getCursorPercent ? await ipc.getCursorPercent() : null;
++        const x =
++          typeof pos?.x === "number" && Number.isFinite(pos.x) ? pos.x : null;
++        const y =
++          typeof pos?.y === "number" && Number.isFinite(pos.y) ? pos.y : null;
++        if (!disposed && x !== null && y !== null) {
++          setPointer({ x, y });
++        }
++      } catch {
++        // keep last known position
++      } finally {
++        if (!disposed) {
++          timer = window.setTimeout(poll, POINTER_POLL_MS);
++        }
++      }
++    };
++
++    void poll();
++    return () => {
++      disposed = true;
++      if (timer) window.clearTimeout(timer);
++    };
++  }, [isVisible, hasStep, followPointer]);
++
++  const wasFollowingRef = useRef(false);
++  const isFollowing = !hasStep && followPointer && pointer !== null;
++  useEffect(() => {
++    wasFollowingRef.current = isFollowing;
++  }, [isFollowing]);
++
++  if (!isVisible) return null;
++
++  const source = hasStep ? step : followPointer ? pointer : null;
++  if (!source) return null;
+ 
+-  const percentX = clampPercent(step.viewportX ?? step.x);
+-  const percentY = clampPercent(step.viewportY ?? step.y);
++  const percentX = clampPercent(source.viewportX ?? source.x);
++  const percentY = clampPercent(source.viewportY ?? source.y);
++  const offsetX = hasStep ? 0 : POINTER_OFFSET.x;
++  const offsetY = hasStep ? 0 : POINTER_OFFSET.y;
+ 
+   return (
+     <div
+       className="openui-ghost-cursor-host"
+       style={{
+-        transform: cursorTransform(percentX, percentY, dims),
++        transform: cursorTransform(percentX, percentY, dims, offsetX, offsetY),
++        // Smooth the 70ms pointer polls into a gentle glide; keep step
++        // targets snappy so the tail lands exactly where the guide points.
++        transition:
++          isFollowing && wasFollowingRef.current
++            ? `transform ${POINTER_POLL_MS + 30}ms linear`
++            : "none",
+       }}
+     >
+       <GhostCursorIcon speaking={isSpeaking} />
+diff --git a/src/renderer/overlay/transcriptFilter.ts b/src/renderer/overlay/transcriptFilter.ts
+new file mode 100644
+index 0000000..7873f77
+--- /dev/null
++++ b/src/renderer/overlay/transcriptFilter.ts
+@@ -0,0 +1,73 @@
++/**
++ * Guards the hands-free listener against Whisper hallucinations.
++ *
++ * Whisper reliably invents fixed phrases ("Thank you.", "Thanks for
++ * watching!", "you", bracketed annotations) when fed silence or ambient
++ * noise. The hands-free loop records ambient audio with no user gesture, so
++ * accepting those phrases makes the ghost answer nobody — the "randomly
++ * talking" failure mode. The push-to-talk mic button is deliberate and stays
++ * unfiltered.
++ */
++
++const MIN_VOICED_MS = 400;
++
++/** Lowercased, punctuation-stripped phrases Whisper emits on silence/noise. */
++const HALLUCINATED_PHRASES = new Set([
++  "you",
++  "bye",
++  "bye bye",
++  "thank you",
++  "thanks",
++  "thank you very much",
++  "thank you so much",
++  "thanks for watching",
++  "thank you for watching",
++  "thank you so much for watching",
++  "thanks for watching and see you in the next video",
++  "see you in the next video",
++  "please subscribe",
++  "subscribe",
++  "like and subscribe",
++  "the end",
++  "music",
++  "applause",
++  "silence",
++  "blank audio",
++  "no audio",
++  "uh",
++  "um",
++  "hmm",
++  "mm",
++  "ah",
++  "oh",
++  "so",
++]);
++
++export function normalizeTranscript(text: string): string {
++  return text
++    .toLowerCase()
++    .replace(/[[\]()*♪]/g, " ")
++    .replace(/[.,!?;:'"_-]/g, " ")
++    .replace(/\s+/g, " ")
++    .trim();
++}
++
++export function isLikelyHallucinatedTranscript(text: string): boolean {
++  const normalized = normalizeTranscript(text);
++  if (!normalized) return true;
++  if (!/[a-z]/.test(normalized)) return true;
++  if (normalized.length < 2) return true;
++  return HALLUCINATED_PHRASES.has(normalized);
++}
++
++/**
++ * Accept an ambient (hands-free) transcript only when the mic actually heard
++ * sustained speech and the text isn't a known hallucination.
++ */
++export function shouldAcceptAmbientTranscript(
++  text: string,
++  voicedMs: number,
++): boolean {
++  if (voicedMs < MIN_VOICED_MS) return false;
++  return !isLikelyHallucinatedTranscript(text);
++}
+diff --git a/src/renderer/src/OverlayApp.tsx b/src/renderer/src/OverlayApp.tsx
+index 8cf5c9a..d15656d 100644
+--- a/src/renderer/src/OverlayApp.tsx
++++ b/src/renderer/src/OverlayApp.tsx
+@@ -28,6 +28,7 @@ import { TargetPreviewGhost } from "../overlay/TargetPreviewGhost";
+ import { usePerimeterRoam } from "../overlay/usePerimeterRoam";
+ import { VoiceMicButton } from "../overlay/VoiceMicButton";
+ import { buildReasoningLines } from "../overlay/buildReasoningLines";
++import { shouldAcceptAmbientTranscript } from "../overlay/transcriptFilter";
+ import type {
+   BehavioralCheckpoint,
+   BehavioralDiff,
+@@ -541,6 +542,120 @@ const OverlayApp: React.FC = () => {
+     }
+   }, []);
+ 
++  // Hands-free listener. Tuned so real questions survive and ambient noise
++  // doesn't: the utterance clock starts at first detected speech (not at
++  // listen start), a thinking pause doesn't cut the user off, and transcripts
++  // must pass the hallucination filter before they count as user input —
++  // Whisper invents phrases like "Thank you." on silence, which is what made
++  // the ghost talk to nobody.
++  const ghostAutoListen = async (): Promise<void> => {
++    if (modeRef.current !== "ultra" && !demoPresentationRef.current) {
++      setUltraState("waitingForUser");
++      return;
++    }
++
++    cancelGhostListen();
++    const listenCtx = { cancelled: false };
++    ghostListenAbortRef.current = listenCtx;
++    setUltraState("listening");
++
++    const { MicRecorder } = await import("../overlay/MicRecorder");
++    const recorder = new MicRecorder();
++
++    const POLL_MS = 150;
++    const SILENCE_CONFIRM_MS = 1500;
++    const MAX_LEAD_SILENCE_MS = 8000;
++    const MAX_UTTERANCE_MS = 20_000;
++    const startedAt = Date.now();
++    let speechStartAt: number | null = null;
++    let voicedMs = 0;
++    let silenceStartAt: number | null = null;
++
++    try {
++      await recorder.start();
++    } catch {
++      ghostListenAbortRef.current = null;
++      setUltraState("waitingForUser");
++      return;
++    }
++
++    await new Promise<void>((resolve) => {
++      const poll = setInterval(() => {
++        const now = Date.now();
++        if (
++          listenCtx.cancelled ||
++          (!speechStartAt && now - startedAt >= MAX_LEAD_SILENCE_MS) ||
++          (speechStartAt && now - speechStartAt >= MAX_UTTERANCE_MS)
++        ) {
++          clearInterval(poll);
++          resolve();
++          return;
++        }
++        const levels = recorder.getAudioLevels();
++        if (levels && levels.length > 0) {
++          // Use peak value rather than average — much more reliable for speech detection.
++          // Frequency bins during speech will have several bins with high energy (200+),
++          // while ambient noise stays mostly under 60 across all bins.
++          let peak = 0;
++          for (let i = 0; i < levels.length; i++) {
++            if (levels[i] > peak) peak = levels[i];
++          }
++          // Peak > 80 reliably indicates speech on most microphones in most environments.
++          // Much more robust than averaging which gets pulled down by silent bins.
++          if (peak > 80) {
++            if (!speechStartAt) speechStartAt = now;
++            voicedMs += POLL_MS;
++            silenceStartAt = null;
++          } else if (speechStartAt) {
++            if (!silenceStartAt) silenceStartAt = now;
++            else if (now - silenceStartAt >= SILENCE_CONFIRM_MS) {
++              clearInterval(poll);
++              resolve();
++            }
++          }
++        }
++      }, POLL_MS);
++    });
++
++    if (listenCtx.cancelled) {
++      await recorder.stop().catch(() => {});
++      return;
++    }
++
++    const buffer = await recorder.stop().catch(() => new ArrayBuffer(0));
++
++    if (!buffer.byteLength || !speechStartAt) {
++      ghostListenAbortRef.current = null;
++      setUltraState("waitingForUser");
++      return;
++    }
++
++    setUltraState("transcribing");
++    const transcribeResult = await (window as any).api
++      .transcribe(buffer)
++      .catch(() => ({ ok: false }));
++
++    if (listenCtx.cancelled) return;
++    ghostListenAbortRef.current = null;
++
++    const spokenText =
++      transcribeResult?.ok && typeof transcribeResult.text === "string"
++        ? transcribeResult.text.trim()
++        : "";
++
++    if (spokenText && shouldAcceptAmbientTranscript(spokenText, voicedMs)) {
++      await handleUltraSpokenInput(spokenText);
++    } else {
++      if (spokenText) {
++        console.log("[LISTEN] discarded ambient transcript", {
++          spokenText,
++          voicedMs,
++        });
++      }
++      setUltraState("waitingForUser");
++    }
++  };
++
+   const speakIfUltra = (text: string, moment: string) => {
+     const currentMode = modeRef.current;
+     const demoMode = demoPresentationRef.current;
+@@ -568,105 +683,7 @@ const OverlayApp: React.FC = () => {
+           } else if (result?.providerUsed === "gemini") {
+             console.log("[TTS] used Gemini fallback");
+           }
+-          void (async () => {
+-            if (modeRef.current !== "ultra" && !demoPresentationRef.current) {
+-              setUltraState("waitingForUser");
+-              return;
+-            }
+-
+-            cancelGhostListen();
+-            const listenCtx = { cancelled: false };
+-            ghostListenAbortRef.current = listenCtx;
+-            setUltraState("listening");
+-
+-            const { MicRecorder } = await import("../overlay/MicRecorder");
+-            const recorder = new MicRecorder();
+-
+-            const SILENCE_CONFIRM_MS = 1200;
+-            const MAX_LISTEN_MS = 7000;
+-            const startedAt = Date.now();
+-            let speechDetected = false;
+-            let silenceStartAt: number | null = null;
+-
+-            try {
+-              await recorder.start();
+-            } catch {
+-              ghostListenAbortRef.current = null;
+-              setUltraState("waitingForUser");
+-              return;
+-            }
+-
+-            await new Promise<void>((resolve) => {
+-              const poll = setInterval(() => {
+-                if (
+-                  listenCtx.cancelled ||
+-                  Date.now() - startedAt >= MAX_LISTEN_MS
+-                ) {
+-                  clearInterval(poll);
+-                  resolve();
+-                  return;
+-                }
+-                const levels = recorder.getAudioLevels();
+-                if (levels && levels.length > 0) {
+-                  // Use peak value rather than average — much more reliable for speech detection.
+-                  // Frequency bins during speech will have several bins with high energy (200+),
+-                  // while ambient noise stays mostly under 60 across all bins.
+-                  let peak = 0;
+-                  for (let i = 0; i < levels.length; i++) {
+-                    if (levels[i] > peak) peak = levels[i];
+-                  }
+-                  // Peak > 80 reliably indicates speech on most microphones in most environments.
+-                  // Much more robust than averaging which gets pulled down by silent bins.
+-                  if (peak > 80) {
+-                    speechDetected = true;
+-                    silenceStartAt = null;
+-                  } else if (speechDetected) {
+-                    if (!silenceStartAt) silenceStartAt = Date.now();
+-                    else if (
+-                      Date.now() - silenceStartAt >=
+-                      SILENCE_CONFIRM_MS
+-                    ) {
+-                      clearInterval(poll);
+-                      resolve();
+-                    }
+-                  }
+-                }
+-              }, 150);
+-            });
+-
+-            if (listenCtx.cancelled) {
+-              await recorder.stop().catch(() => {});
+-              return;
+-            }
+-
+-            const buffer = await recorder
+-              .stop()
+-              .catch(() => new ArrayBuffer(0));
+-
+-            if (!buffer.byteLength || !speechDetected) {
+-              ghostListenAbortRef.current = null;
+-              setUltraState("waitingForUser");
+-              return;
+-            }
+-
+-            setUltraState("transcribing");
+-            const transcribeResult = await (window as any).api
+-              .transcribe(buffer)
+-              .catch(() => ({ ok: false }));
+-
+-            if (listenCtx.cancelled) return;
+-            ghostListenAbortRef.current = null;
+-
+-            if (
+-              transcribeResult?.ok &&
+-              typeof transcribeResult.text === "string" &&
+-              transcribeResult.text.trim()
+-            ) {
+-              await handleUltraSpokenInput(transcribeResult.text);
+-            } else {
+-              setUltraState("waitingForUser");
+-            }
+-          })();
++          void ghostAutoListen();
+         })
+         .catch((error: unknown) => {
+           setIsSpeaking(false);
+@@ -1310,19 +1327,18 @@ const OverlayApp: React.FC = () => {
+           });
+         }
+ 
++        // The prediction is context, not conversation: show it silently and
++        // start listening. Reading it aloud on every summon was the ghost
++        // "randomly talking" before the user had said anything.
+         const prediction = predictionRes?.prediction?.trim();
+         if (prediction) {
+           setUltraSessionHistory((prev) => {
+             if (prev.length > 0) return prev;
+-            return demoPresentationRef.current
+-              ? prev
+-              : [{ role: "assistant", content: prediction, proactive: true }];
++            return [{ role: "assistant", content: prediction, proactive: true }];
+           });
+-          if (modeRef.current === "ultra" || demoPresentationRef.current) {
+-            speakIfUltra(prediction, "proactive summon");
+-          } else {
+-            setUltraState("waitingForUser");
+-          }
++        }
++        if (modeRef.current === "ultra" || demoPresentationRef.current) {
++          void ghostAutoListen();
+         } else {
+           setUltraState("waitingForUser");
+         }
+-- 
+2.47.1
+

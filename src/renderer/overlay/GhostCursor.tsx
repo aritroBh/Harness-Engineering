@@ -83,11 +83,14 @@ export const GhostCursor: React.FC<GhostCursorProps> = ({
 
   if (!isVisible) return null;
 
-  const source = hasStep ? step : followPointer ? pointer : null;
-  if (!source) return null;
+  if (!hasStep && !(followPointer && pointer)) return null;
 
-  const percentX = clampPercent(source.viewportX ?? source.x);
-  const percentY = clampPercent(source.viewportY ?? source.y);
+  const percentX = clampPercent(
+    hasStep ? (step.viewportX ?? step.x) : pointer!.x,
+  );
+  const percentY = clampPercent(
+    hasStep ? (step.viewportY ?? step.y) : pointer!.y,
+  );
   const offsetX = hasStep ? 0 : POINTER_OFFSET.x;
   const offsetY = hasStep ? 0 : POINTER_OFFSET.y;
 
