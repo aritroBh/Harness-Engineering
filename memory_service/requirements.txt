@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+cognee
+pytest
+pytest-asyncio
+httpx
+pydantic
+python-dotenv

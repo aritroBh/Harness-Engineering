@@ -1,0 +1,31 @@
+SYNTHETIC TRAINING NOTE — NOT REAL PATIENT DATA
+Note Type: Inpatient History and Physical (H&P)
+Author: Hospitalist Service
+Date: 2026-05-08
+
+Chief Complaint: Abdominal pain and nausea x 2 days.
+
+History of Present Illness: Patient is a 58-year-old presenting with diffuse
+abdominal pain, worse in the right lower quadrant, associated with nausea and
+two episodes of non-bloody emesis. Pain is rated 8/10, sharp, non-radiating,
+worse with movement. No fevers, chills, or recent travel. Last bowel movement
+was yesterday morning, normal in character.
+
+Past Medical History: Hypertension. GERD. Prior appendectomy in childhood.
+
+Medications: lisinopril 10 mg daily, omeprazole 20 mg daily.
+
+Allergies: No known drug allergies.
+
+Physical Exam: Vitals stable, afebrile. Abdomen soft, tender to palpation in
+right lower quadrant without rebound or guarding. Bowel sounds present.
+No flank tenderness.
+
+Labs: WBC 11.2, lipase within normal limits, lactate 1.6, basic metabolic
+panel unremarkable.
+
+Imaging: CT abdomen/pelvis with contrast pending at time of admission.
+
+Assessment and Plan: 58-year-old with right lower quadrant pain concerning
+for inflammatory process. Plan: admit for observation, IV fluids, NPO, serial
+abdominal exams, surgical consult, pain control with PRN analgesia.

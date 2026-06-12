@@ -1,0 +1,21 @@
+SYNTHETIC TRAINING NOTE — NOT REAL PATIENT DATA
+Note Type: Gastroenterology Consult Note
+Author: GI Fellow
+Date: 2026-05-08
+
+Reason for Consult: Evaluation of acute abdominal pain in admitted patient.
+
+HPI: 58-year-old admitted today with two days of right lower quadrant pain
+and nausea. CT preliminarily reviewed by radiology suggests possible
+inflammatory changes adjacent to terminal ileum. No prior history of IBD.
+
+Past Medical History: Hypertension, GERD, prior appendectomy.
+
+Imaging: CT abdomen/pelvis with contrast — radiology preliminary read
+notes mild bowel wall thickening of terminal ileum, no free air,
+no abscess.
+
+Assessment and Plan: Possible terminal ileitis vs early infectious enteritis.
+Recommend continue NPO, IV fluids, repeat labs in AM, consider colonoscopy
+if symptoms persist beyond 48 hours. Pain control with short-acting IV
+opioid PRN per primary team. GI will follow.

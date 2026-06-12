@@ -1,0 +1,25 @@
+{
+  "platform": "Luma",
+  "title": "Hackathon: Building your own Agent LLM Wiki",
+  "date": "Saturday, May 16",
+  "time": "12:00 PM - 6:00 PM",
+  "location": "Pebblebed, 1417 15th St, San Francisco, CA 94103",
+  "city": "San Francisco",
+  "presentedBy": "cognee",
+  "hostedBy": ["cognee", "Nicole Levin", "Pebblebed VC", "Sahar Mor", "Marie Owens"],
+  "attendees": 141,
+  "actions": ["Add to Calendar", "Invite a Friend", "Contact Host", "Report Event"],
+  "category": "AI",
+  "prizes": ["$800", "$500", "$200"],
+  "requiredOperations": ["Ingest", "Query + Self-improve", "Lint"],
+  "partners": ["Redis", "Pebblebed"],
+  "schedule": [
+    "12:00 PM — Doors open + Networking",
+    "12:30 PM — Opening remarks + partner demos",
+    "1:00 PM — Hacking begins",
+    "4:30 PM — Project Submission Deadline",
+    "5:00 PM — Finalist presentation & judging",
+    "5:30 PM — Awards ceremony",
+    "6:00 PM — Event wrap-up"
+  ]
+}

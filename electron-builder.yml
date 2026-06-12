@@ -1,0 +1,46 @@
+appId: com.harnessengineering.app
+productName: Harness Engineering
+directories:
+  buildResources: resources
+files:
+  - "!**/.vscode/*"
+  - "!src/*"
+  - "!electron.vite.config.{js,ts,mjs,cjs}"
+  - "!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,RELEASES.md}"
+  - "!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
+  - "!{tsconfig.json,tsconfig.*}"
+  - "!{README.md,tailwind.config.js,postcss.config.js}"
+extraResources:
+  - from: resources/native
+    to: native
+    filter:
+      - "**/*"
+      # Exclude dev-only compiled macOS binary; production compiles on first run.
+      - "!build/**"
+  - from: resources/ambient-listener.html
+    to: ambient-listener.html
+asarUnpack:
+  - resources/**
+  - node_modules/@nut-tree/**
+  - node_modules/uiohook-napi/**
+  - node_modules/node-mac-permissions/**
+mac:
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    - NSScreenCaptureDescription: Harness Engineering needs screen recording to analyze your screen and guide you.
+    - NSAccessibilityUsageDescription: Harness Engineering needs accessibility access to control the cursor.
+  notarize: false
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+win:
+  executableName: Harness Engineering
+linux:
+  target:
+    - AppImage
+    - snap
+    - deb
+  maintainer: electronjs.org
+  category: Utility

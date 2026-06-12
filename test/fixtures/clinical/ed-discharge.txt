@@ -1,0 +1,20 @@
+SYNTHETIC TRAINING NOTE — NOT REAL PATIENT DATA
+Note Type: ED Disposition / Handoff Note
+Author: ED Provider
+Date: 2026-05-08
+
+Disposition: Admit to inpatient medicine.
+
+HPI: As above. Patient with persistent RLQ pain despite single dose of IV
+analgesia in ED. Tolerating small sips of water. Family at bedside.
+
+Medications given in ED: ondansetron 4 mg IV x1, ketorolac 15 mg IV x1.
+
+Allergies: NKDA.
+
+Physical Exam at handoff: Vital signs stable. Abdomen unchanged from
+arrival exam — focal RLQ tenderness without peritoneal signs.
+
+Assessment and Plan: Admit to medicine with surgical consult on board.
+Pain control: continue IV analgesia PRN for breakthrough pain. NPO
+overnight, IV fluids, serial abdominal exams.

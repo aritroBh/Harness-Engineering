@@ -1,0 +1,120 @@
+{
+  "synthetic": true,
+  "app": "Luma",
+  "sessions": [
+    {
+      "id": "event-recap-session-1",
+      "timestamp": "2024-05-16T12:00:00Z",
+      "steps": [
+        {
+          "appName": "Luma",
+          "action": "click",
+          "targetLabel": "Create Event",
+          "x": 80,
+          "y": 10,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "type",
+          "typeText": "Hackathon: Building your own Agent LLM Wiki",
+          "targetLabel": "Event Title",
+          "x": 20,
+          "y": 30,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "type",
+          "typeText": "Saturday, May 16",
+          "targetLabel": "Event Date",
+          "x": 20,
+          "y": 40,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "type",
+          "typeText": "12:00 PM - 6:00 PM",
+          "targetLabel": "Event Time",
+          "x": 20,
+          "y": 50,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "type",
+          "typeText": "Pebblebed, 1417 15th St, San Francisco, CA 94103",
+          "targetLabel": "Event Location",
+          "x": 20,
+          "y": 60,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "type",
+          "typeText": "cognee, Nicole Levin, Pebblebed VC, Sahar Mor, Marie Owens",
+          "targetLabel": "Host / Presented By",
+          "x": 20,
+          "y": 70,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "type",
+          "typeText": "AI Event",
+          "targetLabel": "About Event",
+          "x": 20,
+          "y": 80,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "type",
+          "typeText": "12:00 PM Doors open, 6:00 PM Wrap-up",
+          "targetLabel": "Schedule",
+          "x": 20,
+          "y": 90,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "type",
+          "typeText": "$800, $500, $200",
+          "targetLabel": "Prize Pool",
+          "x": 20,
+          "y": 100,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "type",
+          "typeText": "Redis, Pebblebed",
+          "targetLabel": "Partners",
+          "x": 20,
+          "y": 110,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        },
+        {
+          "appName": "Luma",
+          "action": "click",
+          "targetLabel": "Add to Calendar",
+          "x": 80,
+          "y": 120,
+          "coordinateFrame": "viewport",
+          "targetConfidence": 0.95
+        }
+      ]
+    }
+  ]
+}

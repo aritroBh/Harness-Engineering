@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Specter Ambient Listener</title>
+  </head>
+  <body>
+    <script>
+      const SAMPLE_INTERVAL_MS = 45_000;
+      const RECORD_MS = 4_000;
+      const MIN_RMS = 0.012;
+
+      let mediaRecorder = null;
+      let stream = null;
+
+      async function ensureMic() {
+        if (stream) return stream;
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        return stream;
+      }
+
+      function rmsFromBuffer(audioBuffer) {
+        const data = audioBuffer.getChannelData(0);
+        let sum = 0;
+        for (let i = 0; i < data.length; i += 1) sum += data[i] * data[i];
+        return Math.sqrt(sum / Math.max(1, data.length));
+      }
+
+      async function captureIfAudible() {
+        try {
+          await ensureMic();
+          const chunks = [];
+          const recorder = new MediaRecorder(stream, {
+            mimeType: "audio/webm;codecs=opus",
+          });
+          recorder.ondataavailable = (event) => {
+            if (event.data.size > 0) chunks.push(event.data);
+          };
+
+          const done = new Promise((resolve) => {
+            recorder.onstop = resolve;
+          });
+
+          recorder.start(250);
+          await new Promise((resolve) => setTimeout(resolve, RECORD_MS));
+          recorder.stop();
+          await done;
+
+          const blob = new Blob(chunks, { type: "audio/webm" });
+          if (blob.size < 500) return;
+
+          const audioContext = new AudioContext();
+          const arrayBuffer = await blob.arrayBuffer();
+          const decoded = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+          const rms = rmsFromBuffer(decoded);
+          await audioContext.close();
+
+          if (rms < MIN_RMS) return;
+
+          await window.ambientApi.sendAudioChunk(arrayBuffer);
+        } catch (error) {
+          console.warn("[AMBIENT] capture skipped", error);
+        }
+      }
+
+      setInterval(() => {
+        void captureIfAudible();
+      }, SAMPLE_INTERVAL_MS);
+    </script>
+  </body>
+</html>

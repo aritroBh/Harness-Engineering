@@ -1,0 +1,20 @@
+SYNTHETIC TRAINING NOTE — NOT REAL PATIENT DATA
+Note Type: Emergency Medicine Provider Note
+Author: ED Attending
+Date: 2026-05-08
+
+Chief Complaint: Abdominal pain.
+
+HPI: 58-year-old presenting to ED with two days of progressive abdominal
+pain, now localized to right lower quadrant. Patient reports nausea and
+emesis, no diarrhea, no hematochezia. Tolerated sips of water in triage.
+
+Physical Exam: Alert, in moderate distress from pain. Abdomen with focal
+RLQ tenderness, voluntary guarding, no rebound. Negative psoas sign on exam.
+
+Labs: WBC 11.2 with left shift, lipase normal, UA negative for infection.
+
+Assessment and Plan: Acute abdominal pain — differential includes
+appendicitis (status post prior appendectomy makes this less likely),
+diverticulitis, mesenteric process. Will obtain CT, admit to medicine,
+pain control with IV opioid PRN.

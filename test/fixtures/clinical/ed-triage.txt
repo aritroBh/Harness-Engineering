@@ -1,0 +1,19 @@
+SYNTHETIC TRAINING NOTE — NOT REAL PATIENT DATA
+Note Type: ED Triage / Nursing Note
+Author: Triage RN
+Date: 2026-05-08
+
+Chief Complaint: "My belly hurts and I keep throwing up."
+
+HPI: Patient arrived via private vehicle. Reports onset two days ago,
+worsening over past 12 hours. Pain 8/10, RLQ. Two episodes vomiting today.
+No diarrhea. Last oral intake: clear liquids 4 hours ago.
+
+Allergies: NKDA.
+
+Medications: Reports taking lisinopril and omeprazole at home.
+
+Physical Exam: Awake, alert, oriented x3. Holds abdomen, antalgic gait
+into room. Skin warm and dry. Vital signs within normal limits.
+
+Plan: Triaged ESI level 3, IV access established, labs drawn, MD aware.
