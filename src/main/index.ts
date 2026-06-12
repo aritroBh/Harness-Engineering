@@ -1068,7 +1068,9 @@ app.whenReady().then(async () => {
     getCoordinateCalibrationDiagnostics(),
   );
 
-  ipcMain.handle("coordinate:mapPercentToScreen", async (_event, input) => {
+  ipcMain.handle("coordinate:mapPercentToScreen", async (event, input) => {
+    if (!validateSender(event, overlayWindow))
+      throw new Error("Unauthorized sender");
     const x = clampPercent(input?.x);
     const y = clampPercent(input?.y);
     const mapping = await mapPercentToScreen(x, y);
@@ -1087,7 +1089,9 @@ app.whenReady().then(async () => {
 
   ipcMain.handle(
     "cursor:waitForTarget",
-    async (_event, x, y, tolerancePx = 50, timeoutMs = 12000) => {
+    async (event, x, y, tolerancePx = 50, timeoutMs = 12000) => {
+      if (!validateSender(event, overlayWindow))
+        throw new Error("Unauthorized sender");
       safeLog("[IPC] cursor:waitForTarget", { x, y, tolerancePx, timeoutMs });
       return waitForMouseAtTarget(x, y, tolerancePx, timeoutMs);
     },
@@ -1104,6 +1108,8 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle("screen:capture", async (event) => {
+    if (!validateSender(event, overlayWindow))
+      throw new Error("Unauthorized sender");
     safeLog("[IPC] screen:capture");
     try {
       return await captureScreenBase64();
@@ -1118,6 +1124,8 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle("screen:analyze", async (event, base64PNG, options) => {
+    if (!validateSender(event, overlayWindow))
+      throw new Error("Unauthorized sender");
     safeLog("[IPC] screen:analyze", {
       hasBase64: !!base64PNG,
       captureUnderlying: !!options?.captureUnderlying,

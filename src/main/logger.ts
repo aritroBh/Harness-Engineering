@@ -3,7 +3,8 @@ const SECRET_PATTERNS = [
   /sk-proj-[A-Za-z0-9._-]{8,}/g,
   /sk-[A-Za-z0-9._-]{8,}/g,
   /nvapi-[A-Za-z0-9._-]+/g,
-  /(OPENAI_API_KEY|ANTHROPIC_API_KEY|ELEVENLABS_API_KEY|NVIDIA_API_KEY)\s*=\s*["']?[^"'\s]+/gi,
+  /AIza[A-Za-z0-9._-]{20,}/g,
+  /(GEMINI_API_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|ELEVENLABS_API_KEY|NVIDIA_API_KEY)\s*=\s*["']?[^"'\s]+/gi,
   /(x-api-key|authorization)\s*:\s*["']?[^"',\s}]+/gi,
 ];
 
